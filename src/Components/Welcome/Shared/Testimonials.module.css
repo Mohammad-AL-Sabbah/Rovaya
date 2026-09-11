@@ -1,0 +1,410 @@
+/* src/components/welcome/Testimonials.module.css */
+
+.section {
+  position: relative;
+  background: #f8f9f5;
+  padding: 80px 0 60px;
+  overflow: hidden;
+}
+
+.bgSketches {
+  position: absolute;
+  bottom: 120px;
+  left: 0;
+  right: 0;
+  height: 300px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.sketchSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  position: relative;
+  z-index: 10;
+}
+
+/* ===== Header ===== */
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.subtitleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.line {
+  width: 40px;
+  height: 1.5px;
+  background: #0f3c32;
+  opacity: 0.4;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #0f3c32;
+  font-weight: 600;
+  font-family: 'Tajawal', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.2;
+}
+
+/* ===== Testimonials Grid ===== */
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.testimonialCard {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.testimonialCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(39, 196, 142, 0.15);
+  border-color: rgba(39, 196, 142, 0.3);
+}
+
+.quoteIcon {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  font-size: 48px;
+  color: #27C48E;
+  opacity: 0.2;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.reviewText {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.9;
+  margin-bottom: 28px;
+  font-family: 'Tajawal', sans-serif;
+  text-align: right;
+  flex: 1;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.userDetails {
+  text-align: right;
+  flex: 1;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 4px;
+}
+
+.userLocation {
+  font-size: 13px;
+  color: #888;
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 8px;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.userImage {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid rgba(39, 196, 142, 0.2);
+}
+
+.userImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== Bottom Wave ===== */
+.bottomWave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+}
+
+.bottomWave svg {
+  width: 100%;
+  height: 80px;
+  display: block;
+}
+
+/* ===== Responsive - Large Desktop (1400px+) ===== */
+@media (min-width: 1400px) {
+  .section {
+    padding: 0px 0px 50px;
+  }
+  
+  .title {
+    font-size: 52px;
+  }
+  
+  .testimonialCard {
+    padding: 36px;
+  }
+}
+
+/* ===== Responsive - Desktop (1025px - 1399px) ===== */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .section {
+    padding: 80px 0 60px;
+  }
+  
+  .title {
+    font-size: 44px;
+  }
+  
+  .testimonialCard {
+    padding: 28px;
+  }
+  
+  .testimonialsGrid {
+    gap: 20px;
+  }
+}
+
+/* ===== Responsive - Tablet (768px - 1024px) ===== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section {
+    padding: 70px 0 50px;
+  }
+  
+  .header {
+    margin-bottom: 40px;
+  }
+  
+  .title {
+    font-size: 38px;
+  }
+  
+  .subtitle {
+    font-size: 15px;
+  }
+  
+  .testimonialsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .testimonialCard {
+    padding: 24px;
+  }
+  
+  .bgSketches {
+    display: none;
+  }
+  
+  .bottomWave svg {
+    height: 70px;
+  }
+}
+
+/* ===== Responsive - Mobile (max-width: 767px) ===== */
+@media (max-width: 767px) {
+  .section {
+    padding: 50px 0 40px;
+  }
+  
+  .header {
+    margin-bottom: 32px;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .line {
+    width: 30px;
+  }
+  
+  .testimonialsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .testimonialCard {
+    padding: 24px;
+  }
+  
+  .quoteIcon {
+    font-size: 40px;
+    top: 16px;
+    left: 20px;
+  }
+  
+  .reviewText {
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+  
+  .userInfo {
+    flex-direction: row-reverse;
+    gap: 12px;
+  }
+  
+  .userDetails {
+    text-align: left;
+  }
+  
+  .userName {
+    font-size: 15px;
+  }
+  
+  .userLocation {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .stars {
+    justify-content: flex-start;
+  }
+  
+  .userImage {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .bottomWave svg {
+    height: 60px;
+  }
+}
+
+/* ===== Responsive - Small Mobile (max-width: 479px) ===== */
+@media (max-width: 479px) {
+  .section {
+    padding: 40px 0 30px;
+  }
+  
+  .header {
+    margin-bottom: 24px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+  }
+  
+  .line {
+    width: 24px;
+  }
+  
+  .testimonialCard {
+    padding: 20px;
+  }
+  
+  .quoteIcon {
+    font-size: 36px;
+    top: 12px;
+    left: 16px;
+  }
+  
+  .reviewText {
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  
+  .userImage {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .userName {
+    font-size: 14px;
+  }
+  
+  .userLocation {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  
+  .stars {
+    gap: 2px;
+  }
+  
+  .stars svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .bottomWave svg {
+    height: 50px;
+  }
+}
+
+/* ===== Responsive - Extra Small Mobile (max-width: 360px) ===== */
+@media (max-width: 360px) {
+  .section {
+    padding: 30px 0 20px;
+  }
+  
+  .title {
+    font-size: 24px;
+  }
+  
+  .testimonialCard {
+    padding: 16px;
+  }
+  
+  .reviewText {
+    font-size: 12px;
+  }
+  
+  .userImage {
+    width: 40px;
+    height: 40px;
+  }
+}

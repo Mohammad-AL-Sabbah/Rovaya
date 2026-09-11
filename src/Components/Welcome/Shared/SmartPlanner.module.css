@@ -1,0 +1,457 @@
+/* src/components/welcome/SmartPlanner.module.css */
+
+.section {
+  position: relative;
+  background: #f5f3ee;
+  padding: 80px 0;
+  overflow: hidden;
+}
+
+.bgSketches {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sketchSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  direction: rtl;
+}
+
+/* ===== Text Side (Right in RTL) ===== */
+.textSide {
+  flex: 1;
+  text-align: right;
+  z-index: 2;
+}
+
+.subtitleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.line {
+  width: 40px;
+  height: 1.5px;
+  background: #0f3c32;
+  opacity: 0.4;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #0f3c32;
+  font-weight: 600;
+  font-family: 'Tajawal', sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.description {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 28px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* ===== Advantages List ===== */
+.advantagesList {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.advantageItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.checkIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #27C48E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.advantageText {
+  font-size: 16px;
+  color: #0f3c32;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* ===== Learn More Button ===== */
+.learnMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0f3c32;
+  border: 2px solid #0f3c32;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Tajawal', sans-serif;
+  padding: 10px 24px;
+  transition: all 0.3s ease;
+  background: transparent;
+  margin-right: auto;
+}
+
+.learnMoreBtn:hover {
+  background: #0f3c32;
+  color: white;
+}
+
+/* ===== Image Side (Left in RTL) ===== */
+.imageSide {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageWrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: visible;
+  max-width: 480px;
+  width: 100%;
+}
+
+.mainImage {
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+  display: block;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Floating Card - Small and Elegant ===== */
+.floatingCard {
+  position: absolute;
+  top: 50%;
+  left: -80px;
+  transform: translateY(-50%);
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  z-index: 20;
+}
+
+.fieldsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.fieldRow:hover {
+  background: #f0f1f2;
+}
+
+.fieldRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.fieldIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(39, 196, 142, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.fieldIconDark {
+  background: #0f3c32;
+}
+
+.fieldContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  text-align: right;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.3;
+}
+
+.fieldValue {
+  font-size: 10px;
+  color: #999;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.3;
+}
+
+.createPlanBtn {
+  width: 100%;
+  height: 42px;
+  background: #27C48E;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Tajawal', sans-serif;
+  border: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.createPlanBtn:hover {
+  background: #1fa878;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(39, 196, 142, 0.35);
+}
+
+/* ===== Responsive - Large Desktop ===== */
+@media (min-width: 1400px) {
+  .section {
+    padding: 100px 0;
+  }
+  
+  .title {
+    font-size: 52px;
+  }
+  
+  .floatingCard {
+    width: 300px;
+    left: -100px;
+  }
+}
+
+/* ===== Responsive - Desktop (1025px - 1399px) ===== */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .container {
+    gap: 40px;
+  }
+  
+  .title {
+    font-size: 44px;
+  }
+  
+  .floatingCard {
+    width: 260px;
+    left: -60px;
+    padding: 18px;
+  }
+}
+
+/* ===== Responsive - Tablet (768px - 1024px) ===== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section {
+    padding: 60px 0;
+  }
+  
+  .container {
+    gap: 30px;
+  }
+  
+  .title {
+    font-size: 38px;
+  }
+  
+  .description {
+    font-size: 14px;
+  }
+  
+  .advantageText {
+    font-size: 15px;
+  }
+  
+  .floatingCard {
+    width: 240px;
+    left: -40px;
+    padding: 16px;
+  }
+  
+  .fieldIcon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ===== Responsive - Mobile (max-width: 767px) ===== */
+@media (max-width: 767px) {
+  .section {
+    padding: 50px 0;
+  }
+  
+  .container {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  /* النص أولاً (order: 1)، الصورة ثانياً (order: 2) */
+  .textSide {
+    order: 1;
+    text-align: center;
+  }
+  
+  .subtitleWrapper {
+    justify-content: center;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .description {
+    font-size: 14px;
+  }
+  
+  .advantagesList {
+    align-items: center;
+  }
+  
+  .advantageItem {
+    justify-content: center;
+  }
+  
+  .learnMoreBtn {
+    margin-right: 0;
+  }
+  
+  /* الصورة في الأسفل */
+  .imageSide {
+    order: 2;
+    width: 100%;
+  }
+  
+  .imageWrapper {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+  
+  .mainImage {
+    border-radius: 20px;
+  }
+  
+  .floatingCard {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    margin-top: -30px;
+    border-radius: 16px;
+    padding: 16px;
+  }
+  
+  .bgSketches {
+    display: none;
+  }
+}
+
+/* ===== Responsive - Small Mobile (max-width: 479px) ===== */
+@media (max-width: 479px) {
+  .section {
+    padding: 40px 0 30px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+  }
+  
+  .line {
+    width: 30px;
+  }
+  
+  .description {
+    font-size: 13px;
+  }
+  
+  .advantageText {
+    font-size: 14px;
+  }
+  
+  .floatingCard {
+    padding: 14px;
+  }
+  
+  .fieldRow {
+    padding: 8px 10px;
+  }
+  
+  .fieldLabel {
+    font-size: 11px;
+  }
+  
+  .fieldValue {
+    font-size: 10px;
+  }
+  
+  .fieldIcon {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .createPlanBtn {
+    height: 38px;
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,432 @@
+/* src/components/welcome/WhyRovaya.module.css */
+
+.section {
+  position: relative;
+  background: #f8f9f5;
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  direction: rtl;
+}
+
+/* ===== Image Side (Right in RTL) ===== */
+.imageSide {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+}
+
+/* Green Blob Background */
+.blobBackground {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 115%;
+  height: 115%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.blobBackground svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Main Image with Blob Shape */
+.imageWrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+}
+
+.blobShape {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.12));
+}
+
+/* Brush Stroke Sticker */
+.sticker {
+  position: absolute;
+  bottom: 30px;
+  right: -40px;
+  z-index: 10;
+  transform: rotate(-4deg);
+  width: 280px;
+  height: 110px;
+}
+
+.brushSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.stickerContent {
+  position: relative;
+  z-index: 2;
+  padding: 18px 30px 22px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.stickerText {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* ===== Content Side (Left in RTL) ===== */
+.contentSide {
+  flex: 1;
+  text-align: right;
+}
+
+.subtitleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.line {
+  width: 40px;
+  height: 1.5px;
+  background: #0f3c32;
+  opacity: 0.4;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #0f3c32;
+  font-weight: 600;
+  font-family: 'Tajawal', sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.description {
+  font-size: 17px;
+  color: #555;
+  line-height: 1.9;
+  margin-bottom: 48px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* ===== Features Grid ===== */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.featureCard {
+  text-align: center;
+  padding: 24px 16px;
+  background: white;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(39, 196, 142, 0.15);
+  border-color: rgba(39, 196, 142, 0.3);
+}
+
+.featureIconWrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(39, 196, 142, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+}
+
+.featureCard:hover .featureIconWrapper {
+  background: rgba(39, 196, 142, 0.2);
+  transform: scale(1.1);
+}
+
+.featureTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f3c32;
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.featureSubtitle {
+  font-size: 13px;
+  color: #666;
+  font-family: 'Tajawal', sans-serif;
+  line-height: 1.4;
+}
+
+/* ===== Responsive - Large Desktop ===== */
+@media (min-width: 1400px) {
+  .section {
+    padding: 120px 0;
+  }
+  
+  .title {
+    font-size: 52px;
+  }
+  
+  .sticker {
+    right: -60px;
+    bottom: 40px;
+    width: 300px;
+  }
+  
+  .stickerText {
+    font-size: 24px;
+  }
+}
+
+/* ===== Responsive - Desktop (1025px - 1399px) ===== */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .container {
+    gap: 40px;
+  }
+  
+  .title {
+    font-size: 44px;
+  }
+  
+  .featuresGrid {
+    gap: 16px;
+  }
+  
+  .featureCard {
+    padding: 20px 12px;
+  }
+  
+  .featureIconWrapper {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .sticker {
+    right: -30px;
+    width: 260px;
+  }
+  
+  .stickerText {
+    font-size: 20px;
+  }
+}
+
+/* ===== Responsive - Tablet (768px - 1024px) ===== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section {
+    padding: 80px 0;
+  }
+  
+  .container {
+    gap: 30px;
+  }
+  
+  .title {
+    font-size: 38px;
+  }
+  
+  .description {
+    font-size: 15px;
+    margin-bottom: 36px;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .imageSide {
+    min-height: 420px;
+  }
+  
+  .sticker {
+    right: 0;
+    bottom: 20px;
+    width: 240px;
+  }
+  
+  .stickerText {
+    font-size: 18px;
+  }
+}
+
+/* ===== Responsive - Mobile (max-width: 767px) ===== */
+@media (max-width: 767px) {
+  .section {
+    padding: 60px 0;
+  }
+  
+  .container {
+    flex-direction: column-reverse;
+    gap: 40px;
+  }
+  
+  .contentSide {
+    order: 1;
+    text-align: center;
+  }
+  
+  .subtitleWrapper {
+    justify-content: center;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .description {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .featureCard {
+    padding: 20px 12px;
+  }
+  
+  .featureIconWrapper {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .featureTitle {
+    font-size: 13px;
+  }
+  
+  .featureSubtitle {
+    font-size: 12px;
+  }
+  
+  .imageSide {
+    order: 2;
+    width: 100%;
+    min-height: 380px;
+  }
+  
+  .sticker {
+    right: 10px;
+    bottom: 10px;
+    width: 220px;
+    transform: rotate(-3deg);
+  }
+  
+  .stickerText {
+    font-size: 16px;
+  }
+}
+
+/* ===== Responsive - Small Mobile (max-width: 479px) ===== */
+@media (max-width: 479px) {
+  .section {
+    padding: 50px 0 30px;
+  }
+  
+  .title {
+    font-size: 26px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .line {
+    width: 30px;
+  }
+  
+  .description {
+    font-size: 13px;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .featureCard {
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: right;
+  }
+  
+  .featureIconWrapper {
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  
+  .featureTitle {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  
+  .featureSubtitle {
+    font-size: 11px;
+  }
+  
+  .imageSide {
+    min-height: 320px;
+  }
+  
+  .sticker {
+    width: 200px;
+    height: 90px;
+  }
+  
+  .stickerText {
+    font-size: 14px;
+  }
+  
+  .stickerContent {
+    padding: 14px 20px 18px;
+  }
+}
