@@ -1,7 +1,6 @@
 // src/Routes/AppRoutes.jsx
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { WelcomePage } from '../pages/Welcome/WelcomePage';
-import { DashboardPage }  from '../pages/ControlPanel/DashboardPage';
 
 const router = createBrowserRouter([
   // الصفحة الرئيسية - Welcome Page
@@ -13,7 +12,6 @@ const router = createBrowserRouter([
   // لوحة التحكم - Dashboard
   {
     path: '/admin',
-    element: <DashboardPage />,
   },
   
   // يمكن إضافة مسارات أخرى لاحقاً
