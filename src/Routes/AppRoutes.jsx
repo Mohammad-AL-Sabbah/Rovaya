@@ -1,6 +1,7 @@
 // src/Routes/AppRoutes.jsx
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { WelcomePage } from '../pages/Welcome/WelcomePage';
+import { WelcomePage } from '../Pages/Welcome/WelcomePage';
+
 
 const router = createBrowserRouter([
   // الصفحة الرئيسية - Welcome Page
