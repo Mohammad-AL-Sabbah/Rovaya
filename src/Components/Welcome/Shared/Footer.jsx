@@ -53,7 +53,7 @@ export function Footer() {
       </Box>
 
       {/* ===== Bottom Section - Redesigned ===== */}
-      <Box className={classes.bottomSection}>
+      <Box className={classes.bottomSection} id="footer">
         <Container size="xl">
           <div className={classes.bottomContent}>
             {/* Column 1: About (Right) */}

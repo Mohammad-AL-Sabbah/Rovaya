@@ -18,7 +18,7 @@ export function WhyRovaya() {
   const brushPath = "M15,55 C25,35 50,25 90,22 C140,18 200,20 250,28 C275,32 290,40 290,50 C290,60 275,68 250,72 C200,78 140,80 90,78 C50,76 25,70 15,55 Z";
 
   return (
-    <Box className={classes.section}>
+    <Box className={classes.section} id="whyRovaya">
       <Container size="xl" className={classes.container}>
         {/* Right Side - Image with Blob */}
         <Box className={classes.imageSide}>

@@ -16,7 +16,8 @@ import {
   IconCalendar, 
   IconUsers, 
   IconWallet,
-  IconSparkles
+  IconSparkles,
+  IconDownload
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import classes from './HeroSection.module.css';
@@ -26,12 +27,13 @@ export function HeroSection() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
 
+  // تم تحديث الروابط لتستخدم IDs للتنقل داخل الصفحة
   const navLinks = [
-    { label: 'مخطط الرحلات', link: '/trip-planner' },
-    { label: 'الفنادق', link: '/hotels' },
-    { label: 'المطاعم', link: '/restaurants' },
-    { label: 'الأماكن السياحية', link: '/tourist-places' },
+{ label: 'التقييمات', link: '#testimonials' },
     { label: 'المدن', link: '#cities' },
+    { label: 'تواصل معنا', link: '#footer' },
+    { label: 'مخطط الرحلات', link: '#planner' },
+    { label: 'لماذا نحن ؟', link: '#whyRovaya' },
     { label: 'الرئيسية', link: '/' },
   ];
 
@@ -42,13 +44,26 @@ export function HeroSection() {
     { label: 'الميزانية', placeholder: 'اختر الميزانية', icon: IconWallet },
   ];
 
+  // دالة للتعامل مع النقر على الروابط (تمرير سلس للـ IDs أو تنقل للروابط العادية)
+  const handleLinkClick = (link) => {
+    if (link.startsWith('#')) {
+      const element = document.querySelector(link);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      navigate(link);
+    }
+    setDrawerOpened(false); // إغلاق القائمة في الموبايل بعد النقر
+  };
+
   return (
     <Box className={classes.hero}>
       <Box className={classes.overlay} />
 
       {/* Navbar */}
       <Box className={classes.nav}>
-        {/* Logo - يظهر من sm فما فوق */}
+        {/* Logo */}
         <Group gap="xs" visibleFrom="sm">
           <Box className={classes.logoIcon}>
             <IconMapPin size={22} color="white" />
@@ -59,12 +74,12 @@ export function HeroSection() {
           </div>
         </Group>
 
-        {/* Desktop Navigation - يظهر من md فما فوق */}
+        {/* Desktop Navigation */}
         <Group gap={32} visibleFrom="md">
           {navLinks.map((link) => (
             <Box
               key={link.label}
-              onClick={() => navigate(link.link)}
+              onClick={() => handleLinkClick(link.link)}
               className={classes.navLink}
             >
               <Text>{link.label}</Text>
@@ -72,7 +87,7 @@ export function HeroSection() {
           ))}
         </Group>
 
-        {/* Desktop Auth Button - يظهر من md فما فوق */}
+        {/* Desktop Auth Button */}
         <Group gap="sm" visibleFrom="md">
           <Button
             variant="outline"
@@ -86,7 +101,7 @@ export function HeroSection() {
           </Button>
         </Group>
 
-        {/* Burger Menu - يختفي من md فما فوق */}
+        {/* Burger Menu */}
         <Burger
           opened={drawerOpened}
           onClick={() => setDrawerOpened(!drawerOpened)}
@@ -117,10 +132,7 @@ export function HeroSection() {
                 variant="subtle"
                 size="lg"
                 justify="flex-start"
-                onClick={() => {
-                  navigate(link.link);
-                  setDrawerOpened(false);
-                }}
+                onClick={() => handleLinkClick(link.link)}
               >
                 {link.label}
               </Button>
@@ -130,12 +142,9 @@ export function HeroSection() {
               color="teal"
               size="md"
               mt="md"
-              onClick={() => {
-                navigate('/login');
-                setDrawerOpened(false);
-              }}
+              onClick={() => handleLinkClick('/login')}
             >
-              تسجيل الدخول
+              دخول الموظفين
             </Button>
           </Stack>
         </Drawer>
@@ -183,6 +192,18 @@ export function HeroSection() {
             <Text className={classes.aiText}>
               استخدم الذكاء الاصطناعي لتخطيط رحلتك
             </Text>
+          </Group>
+
+          {/* Download App Button */}
+          <Group justify="center" mt={24}>
+            <Button
+              component="a"
+              href="#" // سيتم استبدال هذا برابط ملف الـ APK لاحقاً
+              className={classes.downloadBtn}
+              leftSection={<IconDownload size={18} />}
+            >
+              حمّل تطبيقنا من هنا
+            </Button>
           </Group>
         </Box>
       </Container>

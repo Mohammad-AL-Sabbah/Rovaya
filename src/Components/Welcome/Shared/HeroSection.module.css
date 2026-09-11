@@ -38,7 +38,6 @@
   margin-top: 2px;
 }
 
-/* زيادة حجم خط النتوءات/الروابط العلوية */
 .navLink {
   cursor: pointer;
   position: relative;
@@ -116,7 +115,6 @@
   margin: 0 auto;
 }
 
-/* كروت البحث السفلية مع محاذاة في التنسيق وفي المنتصف */
 .fieldCard {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -139,11 +137,6 @@
   transform: translateY(-2px);
 }
 
-.aiField {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
 .fieldsRow {
   flex-wrap: wrap;
   justify-content: center;
@@ -159,6 +152,30 @@
 .fieldPlaceholder {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== Download Button Styling ===== */
+.downloadBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0 24px;
+  height: 42px; /* ارتفاع نحيف ومتناسق */
+  border-radius: 21px; /* شكل كبسولة أنيق */
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.downloadBtn:hover {
+  background: #27C48E;
+  border-color: #27C48E;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(39, 196, 142, 0.35);
+  color: white;
 }
 
 .wave {
@@ -285,6 +302,13 @@
 
   .navLink {
     font-size: 16px;
+  }
+  
+  .downloadBtn {
+    width: 100%;
+    max-width: 280px;
+    height: 44px;
+    font-size: 15px;
   }
 }
 

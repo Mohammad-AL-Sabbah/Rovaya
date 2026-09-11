@@ -26,11 +26,11 @@ export function SmartPlanner() {
   return (
     <Box className={classes.section}>
     
-      <Container size="xl" className={classes.container}>
+      <Container size="xl" className={classes.container} id="planner">
         {/* Right Side - Text Content */}
         <Box className={classes.textSide}>
           {/* Subtitle with lines */}
-          <Box className={classes.subtitleWrapper}>
+          <Box className={classes.subtitleWrapper} >
             <Box className={classes.line} />
             <Text className={classes.subtitle}>ميزة أساسية في منصتنا</Text>
             <Box className={classes.line} />

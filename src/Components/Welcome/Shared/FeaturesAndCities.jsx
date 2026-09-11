@@ -68,7 +68,7 @@ export function FeaturesAndCities() {
           </svg>
         </Box>
 
-        <Container size="xl" className={classes.featuresContainer} id='cities'>
+        <Container size="xl" className={classes.featuresContainer}>
           {/* Side Text */}
           <Box className={classes.sideText}>
             <Text className={classes.sideTextMain}>فلسطين...</Text>
@@ -94,7 +94,7 @@ export function FeaturesAndCities() {
       </Box>
 
       {/* ===== Cities Section ===== */}
-      <Box className={classes.citiesSection}>
+      <Box className={classes.citiesSection}  id='cities'>
         <Container size="xl">
           <Box className={classes.citiesHeader}>
             <Text className={classes.citiesSubtitle}>استكشف بعض المدن</Text>

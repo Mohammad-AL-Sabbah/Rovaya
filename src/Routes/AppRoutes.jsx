@@ -1,7 +1,7 @@
 // src/Routes/AppRoutes.jsx
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { WelcomePage } from '../Pages/Welcome/WelcomePage';
-
+import { LoginPage } from '../Pages/ControlPanel/Auth/LoginPage'; // تأكد من المسار الصحيح لملف LoginPage
 
 const router = createBrowserRouter([
   // الصفحة الرئيسية - Welcome Page
@@ -10,23 +10,26 @@ const router = createBrowserRouter([
     element: <WelcomePage />,
   },
   
-  // لوحة التحكم - Dashboard
+  // صفحة دخول الموظفين
   {
-    path: '/admin',
+    path: '/login',
+    element: <LoginPage />,
   },
   
-  // يمكن إضافة مسارات أخرى لاحقاً
+  // لوحة التحكم (يمكن تفعيلها لاحقاً عند إنشاء مكوناتها)
   // {
-  //   path: '/admin/cities',
-  //   element: <CitiesManagement />,
-  // },
-  // {
-  //   path: '/admin/places',
-  //   element: <PlacesManagement />,
-  // },
-  // {
-  //   path: '/admin/login',
-  //   element: <LoginPage />,
+  //   path: '/admin',
+  //   element: <AdminLayout />,
+  //   children: [
+  //     {
+  //       path: '',
+  //       element: <DashboardPage />,
+  //     },
+  //     {
+  //       path: 'cities',
+  //       element: <CitiesManagement />,
+  //     },
+  //   ],
   // },
 ]);
 

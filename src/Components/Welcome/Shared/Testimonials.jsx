@@ -29,7 +29,7 @@ export function Testimonials() {
   ];
 
   return (
-    <Box className={classes.section}>
+    <Box className={classes.section} id="testimonials">
       {/* Background Sketches */}
       <Box className={classes.bgSketches}>
         <svg viewBox="0 0 1440 300" preserveAspectRatio="xMidYMid slice" className={classes.sketchSvg}>
