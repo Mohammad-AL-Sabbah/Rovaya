@@ -1,5 +1,7 @@
 // src/pages/LoginPage.jsx
-import { useState } from 'react';
+import { useState ,   useEffect } from 'react';
+import Swal from 'sweetalert2';
+import API from '../../../API/ApiAuthToken';
 import { 
   Box, 
   Container, 
@@ -11,7 +13,7 @@ import {
   Anchor,
   Checkbox,
   Title,
-  Paper,
+
   Alert
 } from '@mantine/core';
 import { 
@@ -22,7 +24,6 @@ import {
   IconDashboard,
   IconUsers,
   IconMapPin,
-  IconInfoCircle,
   IconCheck
 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
@@ -42,19 +43,70 @@ export function LoginPage() {
     }
   });
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
     setLoading(true);
-    console.log('Login data:', data);
-    
-    setTimeout(() => {
+    try {
+      const response = await API.post('/api/auth/account/login', {
+        email: data.email,
+        password: data.password
+      });
+
+      const token = response.data.accessToken;
+      const roles = response.data.roles || []; // مصفوفة الصلاحيات القادمة من السيرفر
+
+      // التحقق مما إذا كان المستخدم يملك صلاحية Customer فقط (أو ليس لديه صلاحيات الإدارة)
+      if (roles.includes('Customer') && !roles.includes('Admin') && !roles.includes('SuperAdmin')) {
+        setLoading(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'غير مسموح بالدخول',
+          text: 'عذراً، حسابك لا يملك صلاحية الدخول الى لوحة التحكم.',
+          confirmButtonText: 'حسناً',
+          confirmButtonColor: '#10b981'
+        });
+        return; // إيقاف العملية
+      }
+
+      // تخزين بيانات المشرف/الموظف
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('userRoles', JSON.stringify(roles));
+        localStorage.setItem('userName', response.data.firstName || 'مستخدم');
+      }
+
       setLoading(false);
       setShowSuccess(true);
+      
       setTimeout(() => {
         setShowSuccess(false);
-        navigate('/control-panel');
+        navigate('/control-panel', { replace: true });
       }, 1500);
-    }, 1200);
+
+    } catch (err) {
+      setLoading(false);
+      console.error('Login error:', err);
+      
+      // استبدال الـ alert التقليدي بـ SweetAlert احترافي عند حدوث خطأ في تسجيل الدخول
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ في تسجيل الدخول',
+        text: err.response?.data?.message || 'تأكد من صحة البريد الإلكتروني أو كلمة المرور',
+        confirmButtonText: 'حسناً',
+        confirmButtonColor: '#d33'
+      });
+    }
   };
+
+useEffect(() => {
+    document.title = "تسجيل الدخول | Rovaya";
+    
+    // إذا كان المستخدم مسجلاً من قبل ولديه توكن، امنعه من الدخول لصفحة الـ Login وأعحه للوحة التحكم فوراً
+    const token = localStorage.getItem('token');
+    const roles = JSON.parse(localStorage.getItem('userRoles') || '[]');
+    if (token && (roles.includes('Admin') || roles.includes('SuperAdmin'))) {
+      navigate('/control-panel', { replace: true });
+    }
+  }, [navigate]);
 
   return (
     <Box className={classes.loginPage}>
