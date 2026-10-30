@@ -83,7 +83,7 @@ export function RecommendationsPage() {
       params.append('PageNumber', 1);
       params.append('PageSize', 50);
 
-      const response = await API.get(`/Admin/get-all-recommendations?${params.toString()}`);
+      const response = await API.get(`/api/Admin/get-all-recommendations?${params.toString()}`);
       
       console.log('API Response:', response.data);
       
