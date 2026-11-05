@@ -230,7 +230,7 @@ useEffect(() => {
         <Tabs.List mb="xl" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
           <Tabs.Tab value="profile" leftSection={<IconUser size={16} />}>الملف الشخصي</Tabs.Tab>
           <Tabs.Tab value="security" leftSection={<IconShieldLock size={16} />}>الأمان</Tabs.Tab>
-          <Tabs.Tab value="danger" leftSection={<IconAlertTriangle size={16} />} color="red">منطقة الخطر</Tabs.Tab>
+          <Tabs.Tab value="danger" leftSection={<IconAlertTriangle size={16} />} color="red">حذف الحساب </Tabs.Tab>
         </Tabs.List>
 
         {/* Tab 1: Profile */}
