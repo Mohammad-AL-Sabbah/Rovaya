@@ -176,6 +176,11 @@ export function TouristsPage() {
     });
   };
 
+useEffect(() => {
+  document.title = 'إدارة السياح | ROVAYA';
+}, []); 
+
+
   return (
     <Box style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', direction: 'rtl'}}>
       

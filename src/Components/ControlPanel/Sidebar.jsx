@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, NavLink, Text } from '@mantine/core';
 import { 
   IconDashboard, 
@@ -14,7 +14,9 @@ import {
   IconNews,
   IconUserShield,
   IconUser,
-  IconFileAnalytics // ✅ أيقونة سجل الرقابة والتدقيق
+  IconFileAnalytics,
+  IconCategory,
+  IconBuildings
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -23,8 +25,20 @@ export function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // حالة فتح وإغلاق قائمة المستخدمين المنسدلة
   const [usersOpened, setUsersOpened] = useState(false);
+  const [guideOpened, setGuideOpened] = useState(false);
+
+  // ✅ قراءة صلاحيات المستخدم من localStorage
+  const [userRoles, setUserRoles] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('userRoles') || '[]');
+    } catch (error) {
+      return [];
+    }
+  });
+
+  // ✅ التحقق مما إذا كان المستخدم مدير نظام (SuperAdmin)
+  const isSuperAdmin = userRoles.includes('SuperAdmin');
 
   const handleLogout = () => {
     Swal.fire({
@@ -51,7 +65,6 @@ export function Sidebar() {
     });
   };
 
-  // ستايل موحد لعناصر القائمة لضمان المسافات والشكل الجمالي
   const navLinkStyle = (isActive) => ({
     borderRadius: '12px',
     marginBottom: '6px',
@@ -80,7 +93,6 @@ export function Sidebar() {
         zIndex: 100
       }}
     >
-      {/* رأس القائمة والشعار */}
       <Box 
         px="lg" 
         style={{ 
@@ -96,13 +108,12 @@ export function Sidebar() {
         <Text size="14px" c="rgba(255,255,255,0.75)">لوحة التحكم والإدارة لروڤايا</Text>
       </Box>
 
-      {/* محتوى القائمة مع التمرير والأقسام المقسمة */}
       <Box style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
         
         {/* --- 1. القائمة العامة --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">القائمة العامة</Text>
         <NavLink
-          label="الرئيسية (الإحصائيات)"
+          label="الرئيسية"
           leftSection={<IconDashboard size={20} stroke={1.5} />}
           active={location.pathname === '/control-panel'}
           onClick={() => navigate('/control-panel')}
@@ -115,7 +126,6 @@ export function Sidebar() {
         {/* --- 2. الإدارة التشغيلية --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">الإدارة التشغيلية</Text>
         
-        {/* قسم المستخدمين (Collapse) */}
         <NavLink
           label="المستخدمين"
           leftSection={<IconUsers size={20} stroke={1.5} />}
@@ -150,10 +160,8 @@ export function Sidebar() {
           </Box>
         </NavLink>
 
-      
-
         <NavLink
-          label="التوصيات (Recommendations)"
+          label="التوصيات "
           leftSection={<IconStar size={20} stroke={1.5} />}
           active={location.pathname === '/control-panel/recommendations'}
           onClick={() => navigate('/control-panel/recommendations')}
@@ -163,15 +171,48 @@ export function Sidebar() {
         <div style={{ margin: '12px 0', borderTop: '1px solid #f1f5f9' }} />
 
         {/* --- 3. المحتوى والدليل --- */}
-        <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">المحتوى والنشر</Text>
+        <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">المحتوى والدليل</Text>
         
         <NavLink
           label="الدليل السياحي"
           leftSection={<IconBook size={20} stroke={1.5} />}
-          active={location.pathname === '/control-panel/guide'}
-          onClick={() => navigate('/control-panel/guide')}
-          style={navLinkStyle(location.pathname === '/control-panel/guide')}
-        />
+          rightSection={
+            guideOpened ? <IconChevronDown size={16} stroke={1.5} /> : <IconChevronLeft size={16} stroke={1.5} />
+          }
+          opened={guideOpened}
+          onChange={() => setGuideOpened(!guideOpened)}
+          style={{
+            borderRadius: '12px',
+            marginBottom: '6px',
+            fontWeight: 500,
+            color: '#334155',
+            '&:hover': { backgroundColor: '#f1f5f9' }
+          }}
+        >
+          <Box pt={4} pb={4} pr="md">
+            <NavLink
+              label="التصنيفات"
+              leftSection={<IconCategory size={16} stroke={1.5} />}
+              active={location.pathname === '/control-panel/guide/categories'}
+              onClick={() => navigate('/control-panel/guide/categories')}
+              style={navLinkStyle(location.pathname === '/control-panel/guide/categories')}
+            />
+            <NavLink
+              label="المدن"
+              leftSection={<IconBuildings size={16} stroke={1.5} />}
+              active={location.pathname === '/control-panel/guide/cities'}
+              onClick={() => navigate('/control-panel/guide/cities')}
+              style={navLinkStyle(location.pathname === '/control-panel/guide/cities')}
+            />
+            <NavLink
+              label="أقسام المدن"
+              leftSection={<IconMapPin size={16} />}
+              active={location.pathname === '/control-panel/guide/sections'}
+              onClick={() => navigate('/control-panel/guide/sections')}
+              style={navLinkStyle(location.pathname === '/control-panel/guide/sections')}
+            />
+          </Box>
+        </NavLink>
 
         <NavLink
           label="الأخبار والأحداث"
@@ -183,17 +224,19 @@ export function Sidebar() {
 
         <div style={{ margin: '12px 0', borderTop: '1px solid #f1f5f9' }} />
 
-        {/* --- 4. الدعم والنظام --- */}
+        {/* --- 4. النظام --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">النظام</Text>
         
-        {/* ✅ رابط سجل الرقابة الجديد */}
-        <NavLink
-          label="سجل الرقابة (Audit)"
-          leftSection={<IconFileAnalytics size={20} stroke={1.5} />}
-          active={location.pathname === '/control-panel/audit'}
-          onClick={() => navigate('/control-panel/audit')}
-          style={navLinkStyle(location.pathname === '/control-panel/audit')}
-        />
+        {/* ✅ إظهار سجل الرقابة فقط لمدير النظام (SuperAdmin) */}
+        {isSuperAdmin && (
+          <NavLink
+            label="سجل الرقابة (Audit)"
+            leftSection={<IconFileAnalytics size={20} stroke={1.5} />}
+            active={location.pathname === '/control-panel/audit'}
+            onClick={() => navigate('/control-panel/audit')}
+            style={navLinkStyle(location.pathname === '/control-panel/audit')}
+          />
+        )}
 
         <NavLink
           label="الإعدادات"
@@ -205,7 +248,6 @@ export function Sidebar() {
 
       </Box>
 
-      {/* زر تسجيل الخروج السفلي */}
       <Box p="md" style={{ borderTop: '1px solid #f1f5f9', backgroundColor: '#fafafa' }}>
         <NavLink
           label="تسجيل الخروج"

@@ -43,6 +43,10 @@ export function LoginPage() {
     }
   });
 
+// src/pages/LoginPage.jsx
+
+// ... (الكود السابق)
+
 const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -52,9 +56,9 @@ const onSubmit = async (data) => {
       });
 
       const token = response.data.accessToken;
-      const roles = response.data.roles || []; // مصفوفة الصلاحيات القادمة من السيرفر
+      const roles = response.data.roles || []; 
 
-      // التحقق مما إذا كان المستخدم يملك صلاحية Customer فقط (أو ليس لديه صلاحيات الإدارة)
+      // التحقق من الصلاحيات
       if (roles.includes('Customer') && !roles.includes('Admin') && !roles.includes('SuperAdmin')) {
         setLoading(false);
         Swal.fire({
@@ -64,14 +68,23 @@ const onSubmit = async (data) => {
           confirmButtonText: 'حسناً',
           confirmButtonColor: '#10b981'
         });
-        return; // إيقاف العملية
+        return; 
       }
 
-      // تخزين بيانات المشرف/الموظف
+      // ✅ تخزين بيانات المشرف/الموظف بشكل كامل وصحيح
       if (token) {
         localStorage.setItem('token', token);
         localStorage.setItem('userRoles', JSON.stringify(roles));
-        localStorage.setItem('userName', response.data.firstName || 'مستخدم');
+        
+        // ✅ استخدام trim() لإزالة المسافات الزائدة من البداية والنهاية
+        localStorage.setItem('userName', (response.data.firstName || '').trim());
+        localStorage.setItem('lastName', (response.data.lastName || '').trim()); // ✅ إضافة lastName
+        localStorage.setItem('userEmail', (response.data.email || '').trim());
+        
+        // إذا كان الـ Backend يرجع صورة البروفايل في الـ Login Response، احفظها هنا
+        if (response.data.profileImageUrl) {
+            localStorage.setItem('userAvatar', response.data.profileImageUrl);
+        }
       }
 
       setLoading(false);
@@ -86,7 +99,6 @@ const onSubmit = async (data) => {
       setLoading(false);
       console.error('Login error:', err);
       
-      // استبدال الـ alert التقليدي بـ SweetAlert احترافي عند حدوث خطأ في تسجيل الدخول
       Swal.fire({
         icon: 'error',
         title: 'خطأ في تسجيل الدخول',
@@ -96,6 +108,7 @@ const onSubmit = async (data) => {
       });
     }
   };
+
 
 useEffect(() => {
     document.title = "تسجيل الدخول | Rovaya";

@@ -7,7 +7,7 @@ import {
 import {
   IconUsers, IconUserPlus, IconShieldLock, IconShieldOff,
   IconAlertTriangle, IconCheck, IconUserShield, IconBriefcase,
-  IconEye, IconTrash
+  IconEye, IconTrash, IconUserCog // ✅ تمت إضافة أيقونة تغيير الصلاحية
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
@@ -19,7 +19,11 @@ export function EmployeesPage() {
   const [addModalOpened, setAddModalOpened] = useState(false);
   const [blockModalOpened, setBlockModalOpened] = useState(false);
   const [unblockModalOpened, setUnblockModalOpened] = useState(false);
+  const [roleModalOpened, setRoleModalOpened] = useState(false); // ✅ حالة مودال تغيير الصلاحية
+  
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedEmployeeForRole, setSelectedEmployeeForRole] = useState(null); // ✅ موظف محدد لتغيير الصلاحية
+  const [newRole, setNewRole] = useState(''); // ✅ الصلاحية الجديدة
 
   const [addFormData, setAddFormData] = useState({
     firstName: '', lastName: '', email: '', temporaryPassword: '', country: 'فلسطين'
@@ -61,7 +65,10 @@ export function EmployeesPage() {
   useEffect(() => {
     fetchEmployees();
   }, []);
-
+  
+useEffect(() => {
+  document.title = 'إدارة الموظفين | ROVAYA';
+}, []);
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     try {
@@ -81,20 +88,16 @@ export function EmployeesPage() {
 
   const handleBlockEmployee = async () => {
     if (!selectedEmployee) return;
-    
     try {
       const payload = {
         targetUserId: selectedEmployee.id,
         reason: blockFormData.reason,
       };
-
       if (blockFormData.durationUnit !== 'Permanent') {
         payload.durationValue = parseInt(blockFormData.durationValue);
         payload.durationUnit = blockFormData.durationUnit;
       }
-
       const response = await API.post('/api/auth/account/block-user', payload);
-      
       if (response.data.success) {
         Swal.fire({ icon: 'success', title: 'نجاح', text: response.data.message, timer: 2000, showConfirmButton: false });
         setBlockModalOpened(false);
@@ -110,12 +113,10 @@ export function EmployeesPage() {
 
   const handleUnblockEmployee = async () => {
     if (!selectedEmployee) return;
-    
     try {
       const response = await API.post('/api/auth/account/unblock-user', `"${selectedEmployee.id}"`, {
         headers: { 'Content-Type': 'application/json' }
       });
-      
       if (response.data.success) {
         Swal.fire({ icon: 'success', title: 'نجاح', text: response.data.message, timer: 2000, showConfirmButton: false });
         setUnblockModalOpened(false);
@@ -129,55 +130,60 @@ export function EmployeesPage() {
     }
   };
 
-  // ✅ دالة حذف الموظف نهائياً
+  // ✅ دالة تغيير الصلاحية
+  const handleChangeRole = async () => {
+    if (!selectedEmployeeForRole || !newRole) return;
+    try {
+      const response = await API.post('/api/auth/account/change-role', {
+        targetUserId: selectedEmployeeForRole.id,
+        newRole: newRole
+      });
+      
+      if (response.data.success) {
+        Swal.fire({ icon: 'success', title: 'نجاح', text: response.data.message, timer: 2000, showConfirmButton: false });
+        setRoleModalOpened(false);
+        setSelectedEmployeeForRole(null);
+        setNewRole('');
+        fetchEmployees();
+      } else {
+        Swal.fire({ icon: 'error', title: 'فشل', text: response.data.message });
+      }
+    } catch (error) {
+      Swal.fire({ icon: 'error', title: 'خطأ', text: error.response?.data?.message || 'حدث خطأ أثناء تغيير الصلاحية' });
+    }
+  };
+
   const handleDeleteEmployee = async (employeeId, employeeName, empRoles) => {
-    // تحقق أمني إضافي في الواجهة الأمامية
     const isTargetAdminOrSuper = empRoles.includes('Admin') || empRoles.includes('SuperAdmin');
     if (!isSuperAdmin && isTargetAdminOrSuper) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'غير مصرح',
-        text: 'لا يحق للموظف حذف حساب موظف آخر أو مدير نظام. هذه الصلاحية محجوزة للمدير الفائق (SuperAdmin) فقط.'
-      });
+      Swal.fire({ icon: 'warning', title: 'غير مصرح', text: 'لا يحق للموظف حذف حساب موظف آخر أو مدير نظام.' });
       return;
     }
 
     const result = await Swal.fire({
       title: 'هل أنت متأكد تماماً؟',
-      text: `سيتم حذف حساب "${employeeName}" بشكل نهائي ولا يمكن التراجع عن هذا الإجراء!`,
+      text: `سيتم حذف حساب "${employeeName}" بشكل نهائي ولا يمكن التراجع!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#0A3A2A',
-      confirmButtonText: 'نعم، احذف الحساب نهائياً',
+      confirmButtonText: 'نعم، احذف نهائياً',
       cancelButtonText: 'إلغاء'
     });
 
     if (result.isConfirmed) {
       try {
-        // إرسال الـ ID كـ JSON String مباشرة
         const response = await API.post('/api/auth/account/delete-user-account', `"${employeeId}"`, {
           headers: { 'Content-Type': 'application/json' }
         });
-        
         if (response.data.success) {
-          Swal.fire({ 
-            icon: 'success', 
-            title: 'تم الحذف', 
-            text: response.data.message, 
-            timer: 2000, 
-            showConfirmButton: false 
-          });
+          Swal.fire({ icon: 'success', title: 'تم الحذف', text: response.data.message, timer: 2000, showConfirmButton: false });
           fetchEmployees();
         } else {
           Swal.fire({ icon: 'error', title: 'فشل', text: response.data.message });
         }
       } catch (error) {
-        Swal.fire({ 
-          icon: 'error', 
-          title: 'خطأ', 
-          text: error.response?.data?.message || 'حدث خطأ أثناء حذف الحساب' 
-        });
+        Swal.fire({ icon: 'error', title: 'خطأ', text: error.response?.data?.message || 'حدث خطأ' });
       }
     }
   };
@@ -188,9 +194,7 @@ export function EmployeesPage() {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ar-PS', { 
-      year: 'numeric', month: 'long', day: 'numeric' 
-    });
+    return new Date(dateString).toLocaleDateString('ar-PS', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   return (
@@ -236,7 +240,7 @@ export function EmployeesPage() {
         <Paper p="lg" radius="lg" withBorder style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)', border: '2px solid #7e22ce' }}>
           <Group justify="space-between">
             <div>
-              <Text size="sm" c="dimmed" fw={600}> مدراء النظام</Text>
+              <Text size="sm" c="dimmed" fw={600}>مدراء النظام</Text>
               <Text size="3xl" fw={800} c="#7e22ce" mt={4}>{stats.superAdmins}</Text>
               <Text size="xs" c="purple" mt={4}>Super Admin</Text>
             </div>
@@ -263,7 +267,7 @@ export function EmployeesPage() {
           <Group justify="space-between">
             <div>
               <Text size="sm" c="dimmed" fw={600}>نشط / محظور</Text>
-              <Text size="3xl" fw={800} c="#d97706" mt={4}>{stats.active}<Text size="lg" c="dimmed"> / {stats.blocked}</Text></Text>
+              <Text size="3xl" fw={800} c="#d97706" mt={4}>{stats.active}<Text component="span" size="lg" c="dimmed"> / {stats.blocked}</Text></Text>
               <Text size="xs" c="orange" mt={4}>الحالة</Text>
             </div>
             <RingProgress
@@ -324,9 +328,9 @@ export function EmployeesPage() {
                         <Table.Td><Text size="sm">{emp.email}</Text></Table.Td>
                         <Table.Td>
                           {emp.roles.includes('SuperAdmin') ? (
-                            <Badge color="purple" variant="light" leftSection={<IconShieldLock size={12} />}>مدير نظام / Super Admin</Badge>
+                            <Badge color="purple" variant="light" leftSection={<IconShieldLock size={12} />}>مدير نظام</Badge>
                           ) : (
-                            <Badge color="blue" variant="light" leftSection={<IconUsers size={12} />}>موظف / Admin</Badge>
+                            <Badge color="blue" variant="light" leftSection={<IconUsers size={12} />}>موظف</Badge>
                           )}
                         </Table.Td>
                         <Table.Td>
@@ -341,7 +345,24 @@ export function EmployeesPage() {
                           <Group justify="center" gap="xs">
                             {canManage ? (
                               <>
-                                {/* زر الحذف النهائي */}
+                                {/* ✅ زر تغيير الصلاحية: يظهر فقط للـ SuperAdmin */}
+                                {isSuperAdmin && (
+                                  <ActionIcon 
+                                    size="lg"
+                                    color="violet" 
+                                    variant="light" 
+                                    title="تغيير الصلاحية"
+                                    style={{ ':hover': { backgroundColor: '#f3e8ff' } }}
+                                    onClick={() => { 
+                                      setSelectedEmployeeForRole(emp); 
+                                      setNewRole(emp.roles.includes('SuperAdmin') ? 'SuperAdmin' : 'Admin');
+                                      setRoleModalOpened(true); 
+                                    }}
+                                  >
+                                    <IconUserCog size={18} />
+                                  </ActionIcon>
+                                )}
+
                                 <ActionIcon 
                                   size="lg"
                                   color="red" 
@@ -353,7 +374,6 @@ export function EmployeesPage() {
                                   <IconTrash size={18} />
                                 </ActionIcon>
 
-                                {/* أزرار الحظر وفك الحظر */}
                                 {isBlocked ? (
                                   <ActionIcon 
                                     size="lg"
@@ -378,7 +398,6 @@ export function EmployeesPage() {
                                   </ActionIcon>
                                 )}
                                 
-                                {/* زر عرض التفاصيل */}
                                 <ActionIcon 
                                   size="lg"
                                   color="blue" 
@@ -435,6 +454,46 @@ export function EmployeesPage() {
         </form>
       </Modal>
 
+      {/* ✅ مودال تغيير الصلاحية (جديد) */}
+      <Modal 
+        opened={roleModalOpened} 
+        onClose={() => { setRoleModalOpened(false); setSelectedEmployeeForRole(null); setNewRole(''); }} 
+        title={<Group gap="xs"><IconUserCog size={24} color="#7e22ce" /><Text fw={700}>تغيير صلاحية الموظف</Text></Group>} 
+        size="md" 
+        centered
+      >
+        {selectedEmployeeForRole && (
+          <Stack gap="md">
+            <Group p="md" style={{ backgroundColor: '#f3e8ff', borderRadius: '8px', border: '1px solid #d8b4fe' }} gap="xs">
+              <IconUserShield size={24} color="#7e22ce" />
+              <div>
+                <Text size="sm" c="#7e22ce" fw={700}>تغيير الصلاحية للموظف:</Text>
+                <Text size="lg" c="#7e22ce" fw={800}>{selectedEmployeeForRole.firstName} {selectedEmployeeForRole.lastName}</Text>
+              </div>
+            </Group>
+
+            <Select
+              label="الصلاحية الجديدة"
+              required
+              value={newRole}
+              onChange={setNewRole}
+              data={[
+                { value: 'Admin', label: 'موظف (Admin)' },
+                { value: 'SuperAdmin', label: 'مدير نظام (Super Admin)' }
+              ]}
+              description="سيتم منح المستخدم الصلاحيات المحددة فور الحفظ"
+            />
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Button variant="outline" color="gray" onClick={() => { setRoleModalOpened(false); setSelectedEmployeeForRole(null); }}>إلغاء</Button>
+              <Button color="violet" onClick={handleChangeRole} leftSection={<IconCheck size={16} />}>حفظ التغييرات</Button>
+            </Group>
+          </Stack>
+        )}
+      </Modal>
+
       {/* مودال حظر موظف */}
       <Modal opened={blockModalOpened} onClose={() => setBlockModalOpened(false)} title={<Group gap="xs"><IconShieldLock size={24} color="red" /><Text fw={700}>حظر موظف</Text></Group>} size="md" centered>
         {selectedEmployee && (
@@ -446,7 +505,6 @@ export function EmployeesPage() {
                 <Text size="lg" c="#856404" fw={800}>{selectedEmployee.firstName} {selectedEmployee.lastName}</Text>
               </div>
             </Group>
-
             <Select
               label="مدة الحظر"
               required
@@ -459,30 +517,11 @@ export function EmployeesPage() {
                 { value: 'Days', label: 'أيام' },
               ]}
             />
-
             {blockFormData.durationUnit !== 'Permanent' && (
-              <TextInput
-                label="القيمة (عدد الأيام/الساعات/الدقائق)"
-                type="number"
-                required
-                min="1"
-                value={blockFormData.durationValue}
-                onChange={(e) => setBlockFormData({...blockFormData, durationValue: e.target.value})}
-                placeholder="أدخل الرقم"
-              />
+              <TextInput label="القيمة" type="number" required min="1" value={blockFormData.durationValue} onChange={(e) => setBlockFormData({...blockFormData, durationValue: e.target.value})} placeholder="أدخل الرقم" />
             )}
-
-            <Textarea
-              label="سبب الحظر"
-              required
-              placeholder="اكتب سبباً واضحاً للحظر..."
-              minRows={3}
-              value={blockFormData.reason}
-              onChange={(e) => setBlockFormData({...blockFormData, reason: e.target.value})}
-            />
-
+            <Textarea label="سبب الحظر" required placeholder="اكتب سبباً واضحاً للحظر..." minRows={3} value={blockFormData.reason} onChange={(e) => setBlockFormData({...blockFormData, reason: e.target.value})} />
             <Divider />
-
             <Group justify="space-between">
               <Button variant="outline" color="gray" onClick={() => setBlockModalOpened(false)}>إلغاء</Button>
               <Button color="red" onClick={handleBlockEmployee} leftSection={<IconShieldLock size={16} />}>تأكيد الحظر</Button>
@@ -498,21 +537,10 @@ export function EmployeesPage() {
             <ThemeIcon size={80} radius="xl" color="green" variant="light" style={{ backgroundColor: '#dcfce7' }}>
               <IconShieldOff size={40} />
             </ThemeIcon>
-            
-            <Text ta="center" size="lg" fw={700}>
-              هل أنت متأكد من فك الحظر عن:
-            </Text>
-            
-            <Text ta="center" size="xl" fw={800} c="#0A3A2A">
-              {selectedEmployee.firstName} {selectedEmployee.lastName}
-            </Text>
-
-            <Text ta="center" size="sm" c="dimmed">
-              سيتم إعادة تفعيل حساب المستخدم والسماح له بالدخول للنظام
-            </Text>
-
+            <Text ta="center" size="lg" fw={700}>هل أنت متأكد من فك الحظر عن:</Text>
+            <Text ta="center" size="xl" fw={800} c="#0A3A2A">{selectedEmployee.firstName} {selectedEmployee.lastName}</Text>
+            <Text ta="center" size="sm" c="dimmed">سيتم إعادة تفعيل حساب المستخدم والسماح له بالدخول للنظام</Text>
             <Divider />
-
             <Group justify="space-between" w="100%">
               <Button variant="outline" color="gray" onClick={() => setUnblockModalOpened(false)} flex={1}>إلغاء</Button>
               <Button color="green" onClick={handleUnblockEmployee} leftSection={<IconCheck size={16} />} flex={1}>تأكيد فك الحظر</Button>
