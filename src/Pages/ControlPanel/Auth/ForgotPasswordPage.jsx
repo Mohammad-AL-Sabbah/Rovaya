@@ -11,6 +11,8 @@ import {
   IconKey, IconShieldCheck 
 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
+import classes from './ForgotPasswordPage.module.css';
+
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
