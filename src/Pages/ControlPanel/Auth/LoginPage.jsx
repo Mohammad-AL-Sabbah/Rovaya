@@ -188,16 +188,20 @@ useEffect(() => {
             />
 
             {/* Remember Me & Forgot Password */}
-            <Group justify="space-between" className={classes.formOptions}>
-              <Checkbox
-                label="تذكرني"
-                className={classes.rememberCheckbox}
-                {...register('rememberMe')}
-              />
-              <Anchor className={classes.forgotLink}>
-                نسيت كلمة المرور؟
-              </Anchor>
-            </Group>
+  {/* Remember Me & Forgot Password */}
+<Group justify="space-between" className={classes.formOptions}>
+  <Checkbox
+    label="تذكرني"
+    className={classes.rememberCheckbox}
+    {...register('rememberMe')}
+  />
+  <Anchor 
+    className={classes.forgotLink}
+    onClick={() => navigate('/forgot-password')} // ✅ أضف هذا السطر
+  >
+    نسيت كلمة المرور؟
+  </Anchor>
+</Group>
 
             {/* Submit Button */}
             <Button

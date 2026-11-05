@@ -15,6 +15,7 @@ import { TourismGuideCities } from '../Pages/ControlPanel/TourismGuide/TourismGu
 import { CitySections } from '../Pages/ControlPanel/TourismGuide/CitySections';
 import { NewsManagement } from '../Pages/ControlPanel/News/NewsManagement';
 import { SettingsPage } from '../Pages/ControlPanel/Settings/SettingsPage';
+import { ForgotPasswordPage } from '../Pages/ControlPanel/Auth/ForgotPasswordPage';
 
 
 
@@ -28,6 +29,11 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+
+  },
+  { 
     path: '/control-panel',
     element: <ProtectedRoute />, // حراسة المسار بالكامل
     children: [
