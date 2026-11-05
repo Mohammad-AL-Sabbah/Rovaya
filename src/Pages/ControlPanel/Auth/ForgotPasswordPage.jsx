@@ -2,36 +2,65 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
-import { 
-  Box, Container, TextInput, Button, Text, Group, 
+import {
+  Box, Container, TextInput, Button, Text, Group,
   Stepper, Paper, PasswordInput, Alert
 } from '@mantine/core';
-import { 
-  IconMail, IconLock, IconArrowRight, IconCheck, 
-  IconKey, IconShieldCheck 
+import {
+  IconMail, IconLock, IconArrowRight, IconCheck,
+  IconKey, IconShieldCheck
 } from '@tabler/icons-react';
-import { useForm } from 'react-hook-form';
 import classes from './ForgotPasswordPage.module.css';
+
+// إزالة المحارف المخفية (شائعة عند النسخ/اللصق أو مع لوحة المفاتيح العربية)
+const cleanText = (value) =>
+  (value || '').replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '').trim();
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // الخطوة 1
+  const [emailInput, setEmailInput] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [email, setEmail] = useState('');
+
+  // الخطوة 2
   const [code, setCode] = useState('');
-  
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+  // الخطوة 3
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmError, setConfirmError] = useState('');
 
   // الخطوة 1: إرسال الكود
-  const handleSendCode = async (data) => {
+  const handleSendCode = async (e) => {
+    e.preventDefault();
+
+    const cleanEmail = cleanText(emailInput).toLowerCase();
+
+    if (!cleanEmail) {
+      setEmailError('البريد الإلكتروني مطلوب');
+      return;
+    }
+    if (!EMAIL_REGEX.test(cleanEmail)) {
+      setEmailError('يرجى إدخال بريد إلكتروني صحيح');
+      return;
+    }
+    setEmailError('');
     setLoading(true);
+
     try {
-      const response = await API.post('/api/auth/account/SendCode', {
-        email: data.email
+      const response = await API.post('/api/auth/Account/SendCode', {
+        email: cleanEmail
       });
 
       if (response.data.success) {
-        setEmail(data.email);
+        setEmail(cleanEmail);
         setActiveStep(1);
         Swal.fire({
           icon: 'success',
@@ -49,10 +78,11 @@ export function ForgotPasswordPage() {
         });
       }
     } catch (error) {
+      console.error('Send Code Error:', error);
       Swal.fire({
         icon: 'error',
-        title: 'خطأ',
-        text: error.response?.data?.message || 'تأكد من صحة البريد الإلكتروني',
+        title: 'خطأ في الاتصال',
+        text: error.response?.data?.message || 'تأكد من صحة البريد الإلكتروني أو حاول مرة أخرى لاحقاً',
         confirmButtonColor: '#d33'
       });
     } finally {
@@ -60,13 +90,13 @@ export function ForgotPasswordPage() {
     }
   };
 
-  // الخطوة 2: التحقق من الكود
-  const handleVerifyCode = async () => {
+  // الخطوة 2: التحقق من الكود (محلياً ثم الانتقال)
+  const handleVerifyCode = () => {
     if (!code || code.length < 4) {
       Swal.fire({
         icon: 'warning',
         title: 'كود غير صحيح',
-        text: 'يرجى إدخال الكود المكون من 4 أرقام',
+        text: 'يرجى إدخال الكود المكون من أرقام',
         confirmButtonColor: '#d33'
       });
       return;
@@ -75,23 +105,39 @@ export function ForgotPasswordPage() {
   };
 
   // الخطوة 3: تغيير كلمة المرور
-  const handleResetPassword = async (data) => {
-    if (data.newPassword !== data.confirmPassword) {
-      Swal.fire({
-        icon: 'error',
-        title: 'كلمات المرور غير متطابقة',
-        text: 'يرجى التأكد من تطابق كلمات المرور',
-        confirmButtonColor: '#d33'
-      });
-      return;
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+
+    let hasError = false;
+
+    if (!newPassword) {
+      setPasswordError('كلمة المرور الجديدة مطلوبة');
+      hasError = true;
+    } else if (newPassword.length < 6) {
+      setPasswordError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      hasError = true;
+    } else {
+      setPasswordError('');
     }
+
+    if (!confirmPassword) {
+      setConfirmError('يرجى تأكيد كلمة المرور');
+      hasError = true;
+    } else if (newPassword !== confirmPassword) {
+      setConfirmError('كلمات المرور غير متطابقة');
+      hasError = true;
+    } else {
+      setConfirmError('');
+    }
+
+    if (hasError) return;
 
     setLoading(true);
     try {
-      const response = await API.patch('/api/auth/account/ResetPassword', {
+      const response = await API.patch('/api/auth/Account/ResetPassword', {
         email: email,
         code: code,
-        newPassword: data.newPassword
+        newPassword: newPassword
       });
 
       if (response.data.success) {
@@ -113,6 +159,7 @@ export function ForgotPasswordPage() {
         });
       }
     } catch (error) {
+      console.error('Reset Password Error:', error);
       Swal.fire({
         icon: 'error',
         title: 'خطأ',
@@ -126,6 +173,11 @@ export function ForgotPasswordPage() {
 
   const handleBackToLogin = () => {
     navigate('/login');
+  };
+
+  // السماح بالرجوع للخطوات السابقة فقط (منع القفز للأمام)
+  const handleStepClick = (step) => {
+    if (step < activeStep) setActiveStep(step);
   };
 
   return (
@@ -148,44 +200,36 @@ export function ForgotPasswordPage() {
           </Box>
 
           {/* Stepper */}
-          <Stepper 
-            active={activeStep} 
-            onStepClick={setActiveStep} 
-            breakpoint="sm"
+          <Stepper
+            active={activeStep}
+            onStepClick={handleStepClick}
             className={classes.stepper}
           >
-            <Stepper.Step 
-              label="البريد الإلكتروني" 
+            <Stepper.Step
+              label="البريد الإلكتروني"
               description="أدخل بريدك"
               icon={<IconMail size={18} />}
             >
               <Paper p="xl" radius="lg" withBorder className={classes.stepPaper}>
-                <Alert 
-                  icon={<IconMail size={20} />} 
-                  title="ملاحظة مهمة" 
-                  color="blue" 
+                <Alert
+                  icon={<IconMail size={20} />}
+                  title="ملاحظة مهمة"
+                  color="blue"
                   mb="md"
                 >
-                  سيتم إرسال كود التحقق المكون من 4 أرقام إلى بريدك الإلكتروني
+                  سيتم إرسال كود التحقق المكون من أرقام إلى بريدك الإلكتروني
                 </Alert>
-                
-                <form onSubmit={handleSubmit(handleSendCode)}>
+
+                <form onSubmit={handleSendCode}>
                   <TextInput
                     label="البريد الإلكتروني"
                     placeholder="employee@rovaya.ps"
-                    type="email"
                     leftSection={<IconMail size={20} stroke={1.5} />}
                     className={classes.inputField}
-                    error={errors.email?.message}
-                    {...register('email', { 
-                      required: 'البريد الإلكتروني مطلوب',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'البريد الإلكتروني غير صالح'
-                      }
-                    })}
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.currentTarget.value)}
+                    error={emailError}
                   />
-                  
                   <Button
                     type="submit"
                     className={classes.submitButton}
@@ -200,16 +244,16 @@ export function ForgotPasswordPage() {
               </Paper>
             </Stepper.Step>
 
-            <Stepper.Step 
-              label="كود التحقق" 
+            <Stepper.Step
+              label="كود التحقق"
               description="أدخل الكود"
               icon={<IconKey size={18} />}
             >
               <Paper p="xl" radius="lg" withBorder className={classes.stepPaper}>
-                <Alert 
-                  icon={<IconCheck size={20} />} 
-                  title="تم إرسال الكود" 
-                  color="green" 
+                <Alert
+                  icon={<IconCheck size={20} />}
+                  title="تم إرسال الكود"
+                  color="green"
                   mb="md"
                 >
                   تم إرسال كود التحقق إلى: <strong>{email}</strong>
@@ -219,7 +263,7 @@ export function ForgotPasswordPage() {
                   label="كود التحقق (4 أرقام)"
                   placeholder="1234"
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                   leftSection={<IconKey size={20} stroke={1.5} />}
                   className={classes.inputField}
                   maxLength={4}
@@ -236,7 +280,6 @@ export function ForgotPasswordPage() {
                   </Button>
                   <Button
                     className={classes.submitButton}
-                    loading={loading}
                     onClick={handleVerifyCode}
                     disabled={!code || code.length < 4}
                     leftSection={<IconCheck size={18} />}
@@ -247,35 +290,30 @@ export function ForgotPasswordPage() {
               </Paper>
             </Stepper.Step>
 
-            <Stepper.Step 
-              label="كلمة المرور الجديدة" 
+            <Stepper.Step
+              label="كلمة المرور الجديدة"
               description="عيّن كلمة مرور"
               icon={<IconLock size={18} />}
             >
               <Paper p="xl" radius="lg" withBorder className={classes.stepPaper}>
-                <Alert 
-                  icon={<IconShieldCheck size={20} />} 
-                  title="أدخل كلمة المرور الجديدة" 
-                  color="teal" 
+                <Alert
+                  icon={<IconShieldCheck size={20} />}
+                  title="أدخل كلمة المرور الجديدة"
+                  color="teal"
                   mb="md"
                 >
                   يجب أن تكون كلمة المرور قوية وتحتوي على 6 أحرف على الأقل
                 </Alert>
 
-                <form onSubmit={handleSubmit(handleResetPassword)}>
+                <form onSubmit={handleResetPassword}>
                   <PasswordInput
                     label="كلمة المرور الجديدة"
                     placeholder="••••••••"
                     leftSection={<IconLock size={20} stroke={1.5} />}
                     className={classes.inputField}
-                    error={errors.newPassword?.message}
-                    {...register('newPassword', { 
-                      required: 'كلمة المرور الجديدة مطلوبة',
-                      minLength: {
-                        value: 6,
-                        message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'
-                      }
-                    })}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.currentTarget.value)}
+                    error={passwordError}
                   />
 
                   <PasswordInput
@@ -284,10 +322,9 @@ export function ForgotPasswordPage() {
                     leftSection={<IconLock size={20} stroke={1.5} />}
                     className={classes.inputField}
                     mt="md"
-                    error={errors.confirmPassword?.message}
-                    {...register('confirmPassword', { 
-                      required: 'يرجى تأكيد كلمة المرور'
-                    })}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.currentTarget.value)}
+                    error={confirmError}
                   />
 
                   <Group justify="space-between" mt="xl">
@@ -336,7 +373,7 @@ export function ForgotPasswordPage() {
       {/* Right Side - Branding */}
       <Box className={classes.imageSide}>
         <Box className={classes.imageOverlay} />
-        
+
         <Box className={classes.brandingContent}>
           <Box className={classes.logoBox}>
             <Box className={classes.logoIcon}>
