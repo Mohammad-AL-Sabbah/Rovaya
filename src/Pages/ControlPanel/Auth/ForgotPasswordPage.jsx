@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
 import {
   Box, Container, TextInput, Button, Text, Group,
-  Stepper, Paper, PasswordInput, Alert
+  Stepper, Paper, PasswordInput, Alert,
 } from '@mantine/core';
 import {
   IconMail, IconLock, IconArrowRight, IconCheck,
@@ -179,6 +179,12 @@ export function ForgotPasswordPage() {
   const handleStepClick = (step) => {
     if (step < activeStep) setActiveStep(step);
   };
+
+
+  
+  useEffect(() => {
+    document.title = 'استعادة كلمة المرور  | ROVAYA';
+  }, []); 
 
   return (
     <Box className={classes.forgotPasswordPage}>

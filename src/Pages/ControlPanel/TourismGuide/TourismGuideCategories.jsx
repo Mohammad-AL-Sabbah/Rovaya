@@ -308,6 +308,12 @@ export function TourismGuideCategories() {
     }
   };
 
+
+useEffect(() => {
+  document.title = 'التصنيفات  | ROVAYA';
+}, []); 
+
+
   return (
 
     <Box

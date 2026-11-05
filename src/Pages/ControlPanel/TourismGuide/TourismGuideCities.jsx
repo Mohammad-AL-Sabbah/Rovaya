@@ -89,6 +89,11 @@ export function TourismGuideCities() {
       setLoading(false);
     }
   };
+useEffect(() => {
+  document.title = 'إدارة المدن | ROVAYA';
+}, []); 
+
+
 
   useEffect(() => {
     fetchData();
@@ -367,6 +372,9 @@ export function TourismGuideCities() {
         </Badge>
       );
     }
+
+
+
 
     return (
       <Group gap={5} wrap="wrap">

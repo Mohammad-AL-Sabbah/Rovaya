@@ -179,6 +179,12 @@ export function AuditPage() {
 
   const hasActiveFilters = searchQuery || selectedAction !== 'all' || filterDate;
 
+
+useEffect(() => {
+  document.title = 'سجل الرقابة والتدقيق  | ROVAYA';
+}, []); 
+
+
   return (
     <Box style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', direction: 'rtl' }}>
       

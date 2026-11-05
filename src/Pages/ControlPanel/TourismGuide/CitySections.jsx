@@ -359,6 +359,11 @@ export function CitySections() {
     return `${name}...${extension}`;
   };
 
+
+useEffect(() => {
+  document.title = 'أقسام المدن | ROVAYA';
+}, []); 
+
   return (
     <Box dir="rtl" style={{ background: '#f5f7f6', minHeight: 'calc(100vh - 75px)', color: '#1f2937' }}>
       {/* Header */}

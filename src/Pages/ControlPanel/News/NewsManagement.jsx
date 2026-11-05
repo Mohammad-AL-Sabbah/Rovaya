@@ -121,6 +121,10 @@ export function NewsManagement() {
     });
   };
 
+  
+useEffect(() => {
+  document.title = ' الأخبار | ROVAYA';
+}, []); 
   return (
     <Box dir="rtl" style={{ background: '#f5f7f6', minHeight: 'calc(100vh - 75px)', padding: '10px', color: '#1f2937' }}>
       
