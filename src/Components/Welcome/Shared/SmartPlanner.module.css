@@ -1,5 +1,174 @@
 /* src/components/welcome/SmartPlanner.module.css */
 
+/* =====================================================
+   Scroll animation – تسلسل واحد منظم:
+   1) الخطوط والعنوان والوصف
+   2) عناصر المزايا واحداً تلو الآخر مع ظهور علامة ✓
+   3) الصورة ثم بطاقة المخطط
+   4) حقول المخطط تظهر بالتتابع ثم الزر
+   - .pending : القسم لم يصل للشاشة بعد
+   - .inView  : بدأت الحركة (مرة واحدة)
+   fill-mode = backwards حتى لا تتعارض مع الـ hover
+   ===================================================== */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUpSmall {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* الدخول من جهة اليمين (بداية النص العربي) */
+@keyframes slideInStart {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes imageIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* بطاقة المخطط: تحافظ على translateY(-50%) الخاص بالتموضع */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* ---- الحالة قبل الظهور ---- */
+.pending .reveal,
+.pending .checkIcon,
+.pending .mainImage,
+.pending .floatingCard {
+  opacity: 0;
+}
+
+.pending .line {
+  transform: scaleX(0);
+}
+
+/* ---- الحركة العامة للعناصر ---- */
+.inView .reveal {
+  animation: fadeUp 0.7s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s)) backwards;
+}
+
+.inView .slideIn {
+  animation-name: slideInStart;
+}
+
+.inView .rowIn {
+  animation-name: fadeUpSmall;
+  animation-duration: 0.5s;
+  --step: 0.12s;
+}
+
+/* ---- الخطوط الجانبية للعنوان الفرعي ---- */
+.inView .line {
+  animation: lineGrow 0.8s var(--ease-out) 0.05s backwards;
+}
+
+.line:first-child {
+  transform-origin: left center;
+}
+
+.line:last-child {
+  transform-origin: right center;
+}
+
+/* ---- علامة ✓ تظهر بعد عنصرها بقليل ---- */
+.inView .checkIcon {
+  animation: popIn 0.45s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s) + 0.2s) backwards;
+}
+
+/* ---- الصورة ثم البطاقة ---- */
+.inView .mainImage {
+  animation: imageIn 1s var(--ease-out) 0.3s backwards;
+}
+
+.inView .floatingCard {
+  animation: cardIn 0.8s var(--ease-out) 0.75s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending .reveal,
+  .pending .checkIcon,
+  .pending .mainImage,
+  .pending .floatingCard {
+    opacity: 1;
+  }
+
+  .pending .line {
+    transform: none;
+  }
+
+  .inView .reveal,
+  .inView .line,
+  .inView .checkIcon,
+  .inView .mainImage,
+  .inView .floatingCard {
+    animation: none;
+  }
+}
+
+/* ===== Section ===== */
 .section {
   position: relative;
   background: #f5f3ee;
@@ -158,7 +327,7 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
-/* ===== Floating Card - Small and Elegant ===== */
+/* ===== Floating Card ===== */
 .floatingCard {
   position: absolute;
   top: 50%;
@@ -268,11 +437,11 @@
   .section {
     padding: 100px 0;
   }
-  
+
   .title {
     font-size: 52px;
   }
-  
+
   .floatingCard {
     width: 300px;
     left: -100px;
@@ -284,11 +453,11 @@
   .container {
     gap: 40px;
   }
-  
+
   .title {
     font-size: 44px;
   }
-  
+
   .floatingCard {
     width: 260px;
     left: -60px;
@@ -301,29 +470,29 @@
   .section {
     padding: 60px 0;
   }
-  
+
   .container {
     gap: 30px;
   }
-  
+
   .title {
     font-size: 38px;
   }
-  
+
   .description {
     font-size: 14px;
   }
-  
+
   .advantageText {
     font-size: 15px;
   }
-  
+
   .floatingCard {
     width: 240px;
     left: -40px;
     padding: 16px;
   }
-  
+
   .fieldIcon {
     width: 28px;
     height: 28px;
@@ -335,57 +504,57 @@
   .section {
     padding: 50px 0;
   }
-  
+
   .container {
     flex-direction: column;
     gap: 30px;
   }
-  
+
   /* النص أولاً (order: 1)، الصورة ثانياً (order: 2) */
   .textSide {
     order: 1;
     text-align: center;
   }
-  
+
   .subtitleWrapper {
     justify-content: center;
   }
-  
+
   .title {
     font-size: 32px;
   }
-  
+
   .description {
     font-size: 14px;
   }
-  
+
   .advantagesList {
     align-items: center;
   }
-  
+
   .advantageItem {
     justify-content: center;
   }
-  
+
   .learnMoreBtn {
     margin-right: 0;
   }
-  
+
   /* الصورة في الأسفل */
   .imageSide {
     order: 2;
     width: 100%;
   }
-  
+
   .imageWrapper {
     max-width: 100%;
     border-radius: 20px;
   }
-  
+
   .mainImage {
     border-radius: 20px;
   }
-  
+
   .floatingCard {
     position: relative;
     top: auto;
@@ -397,7 +566,12 @@
     border-radius: 16px;
     padding: 16px;
   }
-  
+
+  /* البطاقة هنا بدون translateY(-50%)، فنستخدم حركة الظهور العادية */
+  .inView .floatingCard {
+    animation-name: fadeUp;
+  }
+
   .bgSketches {
     display: none;
   }
@@ -408,48 +582,48 @@
   .section {
     padding: 40px 0 30px;
   }
-  
+
   .title {
     font-size: 28px;
   }
-  
+
   .subtitle {
     font-size: 12px;
   }
-  
+
   .line {
     width: 30px;
   }
-  
+
   .description {
     font-size: 13px;
   }
-  
+
   .advantageText {
     font-size: 14px;
   }
-  
+
   .floatingCard {
     padding: 14px;
   }
-  
+
   .fieldRow {
     padding: 8px 10px;
   }
-  
+
   .fieldLabel {
     font-size: 11px;
   }
-  
+
   .fieldValue {
     font-size: 10px;
   }
-  
+
   .fieldIcon {
     width: 26px;
     height: 26px;
   }
-  
+
   .createPlanBtn {
     height: 38px;
     font-size: 13px;

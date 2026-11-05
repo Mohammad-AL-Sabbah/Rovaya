@@ -1,11 +1,81 @@
 /* src/components/welcome/FeaturesAndCities.module.css */
 
+/* =====================================================
+   Scroll reveal animation
+   - .pending : القسم لم يصل للشاشة بعد (العناصر مخفية)
+   - .inView  : وصل للشاشة (تبدأ الحركة مرة واحدة)
+   fill-mode = backwards حتى لا تتعارض الحركة مع الـ hover
+   ===================================================== */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* للنص الجانبي لأنه مائل -3 درجات */
+@keyframes fadeUpTilted {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotate(-3deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-3deg);
+  }
+}
+
+@keyframes fadeInMap {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+
+.pending .reveal {
+  opacity: 0;
+}
+
+.inView .reveal {
+  animation: fadeUp 0.7s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s)) backwards;
+}
+
+.inView .sideText {
+  animation-name: fadeUpTilted;
+}
+
+.inView .mapDecoration {
+  animation: fadeInMap 1.2s ease-out 0.6s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending .reveal {
+    opacity: 1;
+  }
+
+  .inView .reveal,
+  .inView .mapDecoration {
+    animation: none;
+  }
+}
+
 /* ===== Features Section ===== */
 .featuresSection {
   position: relative;
   background: white;
-  padding: 100px 0 60px; /* زيادة padding من الأعلى */
-  padding-top: 120px; /* ضمان مسافة كافية من الأعلى */
+  padding: 100px 0 60px;
+  padding-top: 120px;
 }
 
 .waveTop {
@@ -23,7 +93,7 @@
   gap: 40px;
   align-items: flex-start;
   position: relative;
-  z-index: 10; /* ضمان أن المحتوى فوق الـ wave */
+  z-index: 10;
 }
 
 .sideText {
@@ -34,7 +104,7 @@
 }
 
 .sideTextMain {
-  font-size: 36px; /* تكبير الخط قليلاً */
+  font-size: 36px;
   font-weight: 800;
   color: #0f3c32;
   margin-bottom: 8px;
@@ -214,19 +284,19 @@
     padding: 120px 0 80px;
     padding-top: 140px;
   }
-  
+
   .sideTextMain {
     font-size: 40px;
   }
-  
+
   .sideTextSub {
     font-size: 24px;
   }
-  
+
   .citiesSection {
     padding: 100px 0;
   }
-  
+
   .citiesMainTitle {
     font-size: 40px;
   }
@@ -238,39 +308,44 @@
     padding: 80px 0 40px;
     padding-top: 100px;
   }
-  
+
   .featuresContainer {
     flex-direction: column;
     gap: 40px;
   }
-  
+
   .sideText {
     text-align: center;
     transform: none;
     flex: none;
     width: 100%;
   }
-  
+
+  /* النص غير مائل هنا، فنستخدم الحركة العادية */
+  .inView .sideText {
+    animation-name: fadeUp;
+  }
+
   .sideTextMain {
     font-size: 32px;
   }
-  
+
   .sideTextSub {
     font-size: 20px;
   }
-  
+
   .citiesSection {
     padding: 60px 0;
   }
-  
+
   .citiesMainTitle {
     font-size: 32px;
   }
-  
+
   .cityImage {
     height: 180px;
   }
-  
+
   .mapDecoration {
     display: none;
   }
@@ -282,16 +357,16 @@
     padding: 70px 0 30px;
     padding-top: 90px;
   }
-  
+
   .waveTop svg {
     height: 60px;
   }
-  
+
   .featuresContainer {
     flex-direction: column;
     gap: 32px;
   }
-  
+
   .sideText {
     text-align: center;
     transform: none;
@@ -299,77 +374,82 @@
     width: 100%;
     padding-top: 0;
   }
-  
+
+  /* النص غير مائل هنا، فنستخدم الحركة العادية */
+  .inView .sideText {
+    animation-name: fadeUp;
+  }
+
   .sideTextMain {
-    font-size: 32px; /* تكبير على الموبايل */
+    font-size: 32px;
     margin-bottom: 4px;
   }
-  
+
   .sideTextSub {
     font-size: 18px;
   }
-  
+
   .featuresGrid {
     width: 100%;
   }
-  
+
   .featureCard {
     padding: 24px 20px !important;
   }
-  
+
   .iconWrapper {
     width: 64px;
     height: 64px;
     margin-bottom: 16px;
   }
-  
+
   .iconWrapper svg {
     width: 32px;
     height: 32px;
   }
-  
+
   .featureTitle {
     font-size: 16px;
     margin-bottom: 10px;
   }
-  
+
   .featureDescription {
     font-size: 13px;
   }
-  
+
   .citiesSection {
     padding: 50px 0 30px;
   }
-  
+
   .citiesHeader {
     margin-bottom: 32px;
   }
-  
+
   .citiesSubtitle {
     font-size: 13px;
   }
-  
+
   .citiesMainTitle {
     font-size: 26px;
   }
-  
+
   .cityImage {
     height: 180px;
   }
-  
+
   .cityContent {
     padding: 16px;
   }
-  
+
   .cityName {
     font-size: 18px;
     margin-bottom: 6px;
   }
-  
+
   .cityDescription {
     font-size: 13px;
   }
-  
+
   .mapDecoration {
     display: none;
   }
@@ -381,57 +461,57 @@
     padding: 60px 0 20px;
     padding-top: 80px;
   }
-  
+
   .sideTextMain {
     font-size: 28px;
   }
-  
+
   .sideTextSub {
     font-size: 16px;
   }
-  
+
   .featureCard {
     padding: 20px 16px !important;
   }
-  
+
   .iconWrapper {
     width: 56px;
     height: 56px;
   }
-  
+
   .iconWrapper svg {
     width: 28px;
     height: 28px;
   }
-  
+
   .featureTitle {
     font-size: 15px;
   }
-  
+
   .featureDescription {
     font-size: 12px;
   }
-  
+
   .citiesSection {
     padding: 40px 0 20px;
   }
-  
+
   .citiesMainTitle {
     font-size: 22px;
   }
-  
+
   .cityImage {
     height: 160px;
   }
-  
+
   .cityContent {
     padding: 14px 12px;
   }
-  
+
   .cityName {
     font-size: 16px;
   }
-  
+
   .cityDescription {
     font-size: 12px;
   }
@@ -442,11 +522,11 @@
   .sideTextMain {
     font-size: 26px;
   }
-  
+
   .citiesMainTitle {
     font-size: 20px;
   }
-  
+
   .cityImage {
     height: 140px;
   }

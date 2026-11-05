@@ -1,9 +1,12 @@
 // src/components/welcome/WhyRovaya.jsx
 import { Box, Container, Text } from '@mantine/core';
 import { IconShield, IconCpu, IconMap, IconStar } from '@tabler/icons-react';
+import { useInView } from './useInView';
 import classes from './WhyRovaya.module.css';
 
 export function WhyRovaya() {
+  const [sectionRef, inView] = useInView();
+
   const features = [
     { icon: IconShield, title: 'معلومات موثوقة', subtitle: '' },
     { icon: IconCpu, title: 'تقنيات الذكاء الاصطناعي', subtitle: '' },
@@ -18,7 +21,11 @@ export function WhyRovaya() {
   const brushPath = "M15,55 C25,35 50,25 90,22 C140,18 200,20 250,28 C275,32 290,40 290,50 C290,60 275,68 250,72 C200,78 140,80 90,78 C50,76 25,70 15,55 Z";
 
   return (
-    <Box className={classes.section} id="whyRovaya">
+    <Box
+      ref={sectionRef}
+      className={`${classes.section} ${inView ? classes.inView : classes.pending}`}
+      id="whyRovaya"
+    >
       <Container size="xl" className={classes.container}>
         {/* Right Side - Image with Blob */}
         <Box className={classes.imageSide}>
@@ -53,12 +60,12 @@ export function WhyRovaya() {
               {/* Main brush stroke */}
               <path d={brushPath} fill="#B8E6D0" />
               {/* Rough edges effect */}
-              <path d="M10,55 C30,40 60,30 100,28 C150,25 210,28 260,35 C280,38 290,45 288,52" 
+              <path d="M10,55 C30,40 60,30 100,28 C150,25 210,28 260,35 C280,38 290,45 288,52"
                     stroke="#A8DCC0" strokeWidth="2" fill="none" opacity="0.5"/>
-              <path d="M15,58 C35,45 70,35 110,32 C160,28 220,32 270,40 C285,43 292,48 290,55" 
+              <path d="M15,58 C35,45 70,35 110,32 C160,28 220,32 270,40 C285,43 292,48 290,55"
                     stroke="#C8ECD8" strokeWidth="1.5" fill="none" opacity="0.4"/>
               {/* Underline stroke */}
-              <path d="M110,72 C140,70 180,71 220,73" 
+              <path d="M110,72 C140,70 180,71 220,73"
                     stroke="#27C48E" strokeWidth="3" fill="none" strokeLinecap="round"/>
             </svg>
             <Box className={classes.stickerContent}>
@@ -75,13 +82,26 @@ export function WhyRovaya() {
         <Box className={classes.contentSide}>
           <Box className={classes.subtitleWrapper}>
             <Box className={classes.line} />
-            <Text className={classes.subtitle}>لماذا نختار Rovaya</Text>
+            <Text
+              className={`${classes.subtitle} ${classes.reveal}`}
+              style={{ '--d': '0.15s' }}
+            >
+              لماذا نختار Rovaya
+            </Text>
             <Box className={classes.line} />
           </Box>
 
-          <Text className={classes.title}>تجربة سياحية متكاملة في مكان واحد</Text>
+          <Text
+            className={`${classes.title} ${classes.reveal}`}
+            style={{ '--d': '0.25s' }}
+          >
+            تجربة سياحية متكاملة في مكان واحد
+          </Text>
 
-          <Text className={classes.description}>
+          <Text
+            className={`${classes.description} ${classes.reveal}`}
+            style={{ '--d': '0.4s' }}
+          >
             نوفر لك كل ما تحتاجه لتنظيم رحلتك واستكشاف فلسطين بطريقة ذكية وسهلة.
             من المعلومات الموثوقة إلى الأدلة التفاعلية وحتى الخرائط التفاعلية في التطبيقات الحقيقية.
           </Text>
@@ -90,7 +110,11 @@ export function WhyRovaya() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Box key={index} className={classes.featureCard}>
+                <Box
+                  key={index}
+                  className={`${classes.featureCard} ${classes.reveal}`}
+                  style={{ '--i': index, '--d': '0.6s' }}
+                >
                   <Box className={classes.featureIconWrapper}>
                     <Icon size={32} color="#27C48E" />
                   </Box>

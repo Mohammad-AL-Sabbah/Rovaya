@@ -1,9 +1,12 @@
 // src/components/welcome/Testimonials.jsx
 import { Box, Container, Text, SimpleGrid } from '@mantine/core';
 import { IconStar } from '@tabler/icons-react';
+import { useInView } from './useInView';
 import classes from './Testimonials.module.css';
 
 export function Testimonials() {
+  const [sectionRef, inView] = useInView();
+
   const testimonials = [
     {
       name: 'سارة أحمد',
@@ -29,7 +32,11 @@ export function Testimonials() {
   ];
 
   return (
-    <Box className={classes.section} id="testimonials">
+    <Box
+      ref={sectionRef}
+      className={`${classes.section} ${inView ? classes.inView : classes.pending}`}
+      id="testimonials"
+    >
       {/* Background Sketches */}
       <Box className={classes.bgSketches}>
         <svg viewBox="0 0 1440 300" preserveAspectRatio="xMidYMid slice" className={classes.sketchSvg}>
@@ -38,17 +45,17 @@ export function Testimonials() {
           <path d="M60,220 Q70,200 80,220" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <rect x="110" y="200" width="50" height="80" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <path d="M125,200 Q135,180 145,200" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
-          
+
           {/* Middle buildings */}
           <rect x="300" y="230" width="45" height="50" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <rect x="380" y="210" width="55" height="70" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
-          
+
           {/* Right side buildings */}
           <rect x="1200" y="220" width="50" height="60" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <path d="M1215,220 Q1225,200 1235,220" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <rect x="1280" y="200" width="45" height="80" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <rect x="1350" y="230" width="40" height="50" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
-          
+
           {/* Palm trees */}
           <path d="M200,280 L200,250 M190,260 L200,250 L210,260" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
           <path d="M1100,280 L1100,250 M1090,260 L1100,250 L1110,260" stroke="#d8d4cc" strokeWidth="1" fill="none"/>
@@ -60,16 +67,30 @@ export function Testimonials() {
         <Box className={classes.header}>
           <Box className={classes.subtitleWrapper}>
             <Box className={classes.line} />
-            <Text className={classes.subtitle}>آراء المسافرين</Text>
+            <Text
+              className={`${classes.subtitle} ${classes.reveal}`}
+              style={{ '--d': '0.15s' }}
+            >
+              آراء المسافرين
+            </Text>
             <Box className={classes.line} />
           </Box>
-          <Text className={classes.title}>ماذا يقول زوارنا؟</Text>
+          <Text
+            className={`${classes.title} ${classes.reveal}`}
+            style={{ '--d': '0.25s' }}
+          >
+            ماذا يقول زوارنا؟
+          </Text>
         </Box>
 
         {/* Testimonials Grid */}
         <SimpleGrid cols={3} spacing="lg" className={classes.testimonialsGrid}>
           {testimonials.map((testimonial, index) => (
-            <Box key={index} className={classes.testimonialCard}>
+            <Box
+              key={index}
+              className={`${classes.testimonialCard} ${classes.reveal}`}
+              style={{ '--i': index, '--d': '0.45s', '--step': '0.14s' }}
+            >
               {/* Quote Icon */}
               <Box className={classes.quoteIcon}>"</Box>
 
@@ -81,15 +102,22 @@ export function Testimonials() {
                 <Box className={classes.userDetails}>
                   <Text className={classes.userName}>{testimonial.name}</Text>
                   <Text className={classes.userLocation}>{testimonial.location}</Text>
-                  
+
                   {/* Stars */}
                   <Box className={classes.stars}>
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <IconStar key={i} size={16} color="#27C48E" fill="#27C48E" />
+                      <IconStar
+                        key={i}
+                        size={16}
+                        color="#27C48E"
+                        fill="#27C48E"
+                        className={classes.star}
+                        style={{ '--k': i }}
+                      />
                     ))}
                   </Box>
                 </Box>
-                
+
                 {/* Profile Image */}
                 <Box className={classes.userImage}>
                   <img src={testimonial.image} alt={testimonial.name} />

@@ -1,5 +1,138 @@
 /* src/components/welcome/WhyRovaya.module.css */
 
+/* =====================================================
+   Scroll animation
+   1) الشكل الأخضر ثم الصورة
+   2) العنوان الفرعي والعنوان والوصف
+   3) بطاقات المزايا بالتتابع
+   4) الملصق "اكتشف فلسطين بطريقتك" في النهاية
+   - .pending : القسم لم يصل للشاشة بعد
+   - .inView  : بدأت الحركة (مرة واحدة)
+   fill-mode = backwards حتى لا تتعارض مع الـ hover
+   ===================================================== */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* الشكل الأخضر يحافظ على translate(-50%, -50%) الخاص بالتموضع */
+@keyframes blobIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes imageIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* الملصق يحافظ على ميلانه عبر المتغير --rot */
+@keyframes stickerIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(var(--rot, -4deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--rot, -4deg));
+  }
+}
+
+/* ---- الحالة قبل الظهور ---- */
+.pending .reveal,
+.pending .blobBackground,
+.pending .imageWrapper,
+.pending .sticker {
+  opacity: 0;
+}
+
+.pending .line {
+  transform: scaleX(0);
+}
+
+/* ---- الحركة ---- */
+.inView .reveal {
+  animation: fadeUp 0.7s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s)) backwards;
+}
+
+.inView .line {
+  animation: lineGrow 0.8s var(--ease-out) 0.05s backwards;
+}
+
+.line:first-child {
+  transform-origin: left center;
+}
+
+.line:last-child {
+  transform-origin: right center;
+}
+
+.inView .blobBackground {
+  animation: blobIn 1.1s var(--ease-out) backwards;
+}
+
+.inView .imageWrapper {
+  animation: imageIn 1s var(--ease-out) 0.2s backwards;
+}
+
+.inView .sticker {
+  animation: stickerIn 0.8s var(--ease-out) 1.1s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending .reveal,
+  .pending .blobBackground,
+  .pending .imageWrapper,
+  .pending .sticker {
+    opacity: 1;
+  }
+
+  .pending .line {
+    transform: none;
+  }
+
+  .inView .reveal,
+  .inView .line,
+  .inView .blobBackground,
+  .inView .imageWrapper,
+  .inView .sticker {
+    animation: none;
+  }
+}
+
+/* ===== Section ===== */
 .section {
   position: relative;
   background: #f8f9f5;
@@ -60,11 +193,12 @@
 
 /* Brush Stroke Sticker */
 .sticker {
+  --rot: -4deg;
   position: absolute;
   bottom: 30px;
   right: -40px;
   z-index: 10;
-  transform: rotate(-4deg);
+  transform: rotate(var(--rot));
   width: 280px;
   height: 110px;
 }
@@ -205,17 +339,17 @@
   .section {
     padding: 120px 0;
   }
-  
+
   .title {
     font-size: 52px;
   }
-  
+
   .sticker {
     right: -60px;
     bottom: 40px;
     width: 300px;
   }
-  
+
   .stickerText {
     font-size: 24px;
   }
@@ -226,29 +360,29 @@
   .container {
     gap: 40px;
   }
-  
+
   .title {
     font-size: 44px;
   }
-  
+
   .featuresGrid {
     gap: 16px;
   }
-  
+
   .featureCard {
     padding: 20px 12px;
   }
-  
+
   .featureIconWrapper {
     width: 64px;
     height: 64px;
   }
-  
+
   .sticker {
     right: -30px;
     width: 260px;
   }
-  
+
   .stickerText {
     font-size: 20px;
   }
@@ -259,35 +393,35 @@
   .section {
     padding: 80px 0;
   }
-  
+
   .container {
     gap: 30px;
   }
-  
+
   .title {
     font-size: 38px;
   }
-  
+
   .description {
     font-size: 15px;
     margin-bottom: 36px;
   }
-  
+
   .featuresGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  
+
   .imageSide {
     min-height: 420px;
   }
-  
+
   .sticker {
     right: 0;
     bottom: 20px;
     width: 240px;
   }
-  
+
   .stickerText {
     font-size: 18px;
   }
@@ -298,65 +432,65 @@
   .section {
     padding: 60px 0;
   }
-  
+
   .container {
     flex-direction: column-reverse;
     gap: 40px;
   }
-  
+
   .contentSide {
     order: 1;
     text-align: center;
   }
-  
+
   .subtitleWrapper {
     justify-content: center;
   }
-  
+
   .title {
     font-size: 32px;
   }
-  
+
   .description {
     font-size: 14px;
     margin-bottom: 32px;
   }
-  
+
   .featuresGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-  
+
   .featureCard {
     padding: 20px 12px;
   }
-  
+
   .featureIconWrapper {
     width: 56px;
     height: 56px;
   }
-  
+
   .featureTitle {
     font-size: 13px;
   }
-  
+
   .featureSubtitle {
     font-size: 12px;
   }
-  
+
   .imageSide {
     order: 2;
     width: 100%;
     min-height: 380px;
   }
-  
+
   .sticker {
+    --rot: -3deg;
     right: 10px;
     bottom: 10px;
     width: 220px;
-    transform: rotate(-3deg);
   }
-  
+
   .stickerText {
     font-size: 16px;
   }
@@ -367,28 +501,28 @@
   .section {
     padding: 50px 0 30px;
   }
-  
+
   .title {
     font-size: 26px;
   }
-  
+
   .subtitle {
     font-size: 14px;
   }
-  
+
   .line {
     width: 30px;
   }
-  
+
   .description {
     font-size: 13px;
   }
-  
+
   .featuresGrid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .featureCard {
     padding: 16px 12px;
     display: flex;
@@ -396,36 +530,36 @@
     gap: 12px;
     text-align: right;
   }
-  
+
   .featureIconWrapper {
     width: 48px;
     height: 48px;
     margin: 0;
     flex-shrink: 0;
   }
-  
+
   .featureTitle {
     font-size: 13px;
     margin-bottom: 2px;
   }
-  
+
   .featureSubtitle {
     font-size: 11px;
   }
-  
+
   .imageSide {
     min-height: 320px;
   }
-  
+
   .sticker {
     width: 200px;
     height: 90px;
   }
-  
+
   .stickerText {
     font-size: 14px;
   }
-  
+
   .stickerContent {
     padding: 14px 20px 18px;
   }

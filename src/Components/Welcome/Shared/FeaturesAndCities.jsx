@@ -1,9 +1,45 @@
 // src/components/welcome/FeaturesAndCities.jsx
+import { useEffect, useRef, useState } from 'react';
 import { Box, Container, Text, SimpleGrid, Card } from '@mantine/core';
 import { IconMap, IconRoute, IconMessage, IconLocation } from '@tabler/icons-react';
 import classes from './FeaturesAndCities.module.css';
 
+// يُفعّل الأنيميشن مرة واحدة عند اقتراب القسم من الظهور في الشاشة
+function useInView() {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // متصفحات قديمة: اعرض المحتوى مباشرة
+    if (!('IntersectionObserver' in window)) {
+      setInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px -12% 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, inView];
+}
+
 export function FeaturesAndCities() {
+  const [featuresRef, featuresInView] = useInView();
+  const [citiesRef, citiesInView] = useInView();
+
   const features = [
     {
       icon: IconMap,
@@ -58,7 +94,10 @@ export function FeaturesAndCities() {
   return (
     <>
       {/* ===== Features Section ===== */}
-      <Box className={classes.featuresSection}>
+      <Box
+        ref={featuresRef}
+        className={`${classes.featuresSection} ${featuresInView ? classes.inView : classes.pending}`}
+      >
         <Box className={classes.waveTop}>
           <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
             <path
@@ -70,7 +109,7 @@ export function FeaturesAndCities() {
 
         <Container size="xl" className={classes.featuresContainer}>
           {/* Side Text */}
-          <Box className={classes.sideText}>
+          <Box className={`${classes.sideText} ${classes.reveal}`}>
             <Text className={classes.sideTextMain}>فلسطين...</Text>
             <Text className={classes.sideTextSub}>أكثر من مجرد وجهة</Text>
           </Box>
@@ -80,7 +119,12 @@ export function FeaturesAndCities() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card key={index} className={classes.featureCard} padding="xl">
+                <Card
+                  key={index}
+                  className={`${classes.featureCard} ${classes.reveal}`}
+                  padding="xl"
+                  style={{ '--i': index, '--d': '0.15s' }}
+                >
                   <Box className={classes.iconWrapper}>
                     <Icon size={36} color="#27C48E" />
                   </Box>
@@ -94,16 +138,25 @@ export function FeaturesAndCities() {
       </Box>
 
       {/* ===== Cities Section ===== */}
-      <Box className={classes.citiesSection}  id='cities'>
+      <Box
+        ref={citiesRef}
+        className={`${classes.citiesSection} ${citiesInView ? classes.inView : classes.pending}`}
+        id="cities"
+      >
         <Container size="xl">
-          <Box className={classes.citiesHeader}>
+          <Box className={`${classes.citiesHeader} ${classes.reveal}`}>
             <Text className={classes.citiesSubtitle}>استكشف بعض المدن</Text>
             <Text className={classes.citiesMainTitle}>مدن فلسطينية تنتظرك</Text>
           </Box>
 
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing="md" className={classes.citiesGrid}>
             {cities.map((city, index) => (
-              <Card key={index} className={classes.cityCard} padding={0}>
+              <Card
+                key={index}
+                className={`${classes.cityCard} ${classes.reveal}`}
+                padding={0}
+                style={{ '--i': index, '--d': '0.2s', '--step': '0.09s' }}
+              >
                 <Box className={classes.cityImage}>
                   <img src={city.image} alt={city.name} />
                   <Box className={classes.cityOverlay} />

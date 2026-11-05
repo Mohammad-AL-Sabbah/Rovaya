@@ -1,5 +1,138 @@
 /* src/components/welcome/Testimonials.module.css */
 
+/* =====================================================
+   Scroll animation
+   1) الرسومات الخلفية والعنوان
+   2) بطاقات الآراء بالتتابع، ثم النجوم داخل كل بطاقة
+   3) الموجة السفلية في النهاية
+   - .pending : القسم لم يصل للشاشة بعد
+   - .inView  : بدأت الحركة (مرة واحدة)
+   fill-mode = backwards حتى لا تتعارض مع الـ hover
+   ===================================================== */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* الرسومات الخلفية شفافيتها النهائية 0.6 */
+@keyframes sketchesIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes starIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- الحالة قبل الظهور ---- */
+.pending .reveal,
+.pending .bgSketches,
+.pending .star,
+.pending .bottomWave {
+  opacity: 0;
+}
+
+.pending .line {
+  transform: scaleX(0);
+}
+
+/* ---- الحركة ---- */
+.inView .reveal {
+  animation: fadeUp 0.7s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s)) backwards;
+}
+
+.inView .line {
+  animation: lineGrow 0.8s var(--ease-out) 0.05s backwards;
+}
+
+.line:first-child {
+  transform-origin: left center;
+}
+
+.line:last-child {
+  transform-origin: right center;
+}
+
+.inView .bgSketches {
+  animation: sketchesIn 1.4s ease-out backwards;
+}
+
+/* النجوم تظهر بعد بطاقتها بقليل واحدة تلو الأخرى */
+.inView .star {
+  animation: starIn 0.4s var(--ease-out)
+    calc(var(--d, 0s) + var(--i, 0) * var(--step, 0.1s) + 0.45s + var(--k, 0) * 0.07s) backwards;
+}
+
+.inView .bottomWave {
+  animation: fadeIn 1s ease-out 1.1s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending .reveal,
+  .pending .bgSketches,
+  .pending .star,
+  .pending .bottomWave {
+    opacity: 1;
+  }
+
+  .pending .bgSketches {
+    opacity: 0.6;
+  }
+
+  .pending .line {
+    transform: none;
+  }
+
+  .inView .reveal,
+  .inView .line,
+  .inView .bgSketches,
+  .inView .star,
+  .inView .bottomWave {
+    animation: none;
+  }
+}
+
+/* ===== Section ===== */
 .section {
   position: relative;
   background: #f8f9f5;
@@ -179,11 +312,11 @@
   .section {
     padding: 0px 0px 50px;
   }
-  
+
   .title {
     font-size: 52px;
   }
-  
+
   .testimonialCard {
     padding: 36px;
   }
@@ -194,15 +327,15 @@
   .section {
     padding: 80px 0 60px;
   }
-  
+
   .title {
     font-size: 44px;
   }
-  
+
   .testimonialCard {
     padding: 28px;
   }
-  
+
   .testimonialsGrid {
     gap: 20px;
   }
@@ -213,32 +346,32 @@
   .section {
     padding: 70px 0 50px;
   }
-  
+
   .header {
     margin-bottom: 40px;
   }
-  
+
   .title {
     font-size: 38px;
   }
-  
+
   .subtitle {
     font-size: 15px;
   }
-  
+
   .testimonialsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  
+
   .testimonialCard {
     padding: 24px;
   }
-  
+
   .bgSketches {
     display: none;
   }
-  
+
   .bottomWave svg {
     height: 70px;
   }
@@ -249,71 +382,71 @@
   .section {
     padding: 50px 0 40px;
   }
-  
+
   .header {
     margin-bottom: 32px;
   }
-  
+
   .title {
     font-size: 32px;
   }
-  
+
   .subtitle {
     font-size: 14px;
   }
-  
+
   .line {
     width: 30px;
   }
-  
+
   .testimonialsGrid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .testimonialCard {
     padding: 24px;
   }
-  
+
   .quoteIcon {
     font-size: 40px;
     top: 16px;
     left: 20px;
   }
-  
+
   .reviewText {
     font-size: 14px;
     margin-bottom: 24px;
     line-height: 1.8;
   }
-  
+
   .userInfo {
     flex-direction: row-reverse;
     gap: 12px;
   }
-  
+
   .userDetails {
     text-align: left;
   }
-  
+
   .userName {
     font-size: 15px;
   }
-  
+
   .userLocation {
     font-size: 12px;
     margin-bottom: 6px;
   }
-  
+
   .stars {
     justify-content: flex-start;
   }
-  
+
   .userImage {
     width: 48px;
     height: 48px;
   }
-  
+
   .bottomWave svg {
     height: 60px;
   }
@@ -324,62 +457,62 @@
   .section {
     padding: 40px 0 30px;
   }
-  
+
   .header {
     margin-bottom: 24px;
   }
-  
+
   .title {
     font-size: 28px;
   }
-  
+
   .subtitle {
     font-size: 13px;
   }
-  
+
   .line {
     width: 24px;
   }
-  
+
   .testimonialCard {
     padding: 20px;
   }
-  
+
   .quoteIcon {
     font-size: 36px;
     top: 12px;
     left: 16px;
   }
-  
+
   .reviewText {
     font-size: 13px;
     line-height: 1.8;
     margin-bottom: 20px;
   }
-  
+
   .userImage {
     width: 44px;
     height: 44px;
   }
-  
+
   .userName {
     font-size: 14px;
   }
-  
+
   .userLocation {
     font-size: 11px;
     margin-bottom: 4px;
   }
-  
+
   .stars {
     gap: 2px;
   }
-  
+
   .stars svg {
     width: 14px;
     height: 14px;
   }
-  
+
   .bottomWave svg {
     height: 50px;
   }
@@ -390,19 +523,19 @@
   .section {
     padding: 30px 0 20px;
   }
-  
+
   .title {
     font-size: 24px;
   }
-  
+
   .testimonialCard {
     padding: 16px;
   }
-  
+
   .reviewText {
     font-size: 12px;
   }
-  
+
   .userImage {
     width: 40px;
     height: 40px;
