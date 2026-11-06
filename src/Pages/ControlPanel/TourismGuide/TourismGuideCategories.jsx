@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -123,24 +122,36 @@ export function TourismGuideCategories() {
     }));
   };
 
-  // فتح نافذة الإضافة أو التعديل
-  const openModal = (item = null) => {
-
+  // ✅ فتح نافذة الإضافة أو التعديل - تم التصحيح
+  const openModal = async (item = null) => {
     setEditingItem(item);
 
     if (item) {
+      // ✅ جلب البيانات الإنجليزية عند التعديل
+      let englishData = {};
+      
+      try {
+        const englishResponse = await API.get(
+          `/api/Admin/get-tourism-category/${item.id}?langCode=en`
+        );
+        
+        if (englishResponse.data.success) {
+          englishData = englishResponse.data.data || {};
+        }
+      } catch (error) {
+        console.warn('English data not found:', error);
+      }
 
       setFormData({
         nameAr: item.name || '',
-        nameEn: item.nameEn || '',
+        nameEn: englishData.name || item.nameEn || '',
         descriptionAr: item.description || '',
-        descriptionEn: item.descriptionEn || ''
+        descriptionEn: englishData.description || item.descriptionEn || ''
       });
 
       setImagePreview(item.imageUrl || null);
 
     } else {
-
       setFormData({
         nameAr: '',
         nameEn: '',

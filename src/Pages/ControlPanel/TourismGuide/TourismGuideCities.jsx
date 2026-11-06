@@ -15,7 +15,6 @@ import {
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
 import LocationPicker from '../../../Components/ControlPanel/LocationPicker';
-// أضف استيراد LocationPicker بالمسار الصحيح عندك
 
 const PRIMARY = '#0A3A2A';
 const GOLD = '#E8B04B';
@@ -29,8 +28,6 @@ const emptyCityForm = {
   latitude: '',
   longitude: ''
 };
-
-const emptyPlaceForm = { ...emptyCityForm };
 
 export function TourismGuideCities() {
   const [loading, setLoading] = useState(true);
@@ -48,12 +45,8 @@ export function TourismGuideCities() {
   const [editingCity, setEditingCity] = useState(null);
 
   const [cityForm, setCityForm] = useState(emptyCityForm);
-  const [placeForm, setPlaceForm] = useState(emptyPlaceForm);
-
   const [cityImageFile, setCityImageFile] = useState(null);
   const [cityImagePreview, setCityImagePreview] = useState(null);
-  const [placeImageFile, setPlaceImageFile] = useState(null);
-  const [placeImagePreview, setPlaceImagePreview] = useState(null);
 
   const categoryOptions = categories.map(category => ({
     value: String(category.id),
@@ -79,7 +72,6 @@ export function TourismGuideCities() {
       }
     } catch (error) {
       console.error('Fetch Error:', error);
-
       Swal.fire({
         icon: 'error',
         title: 'تعذر تحميل البيانات',
@@ -89,13 +81,9 @@ export function TourismGuideCities() {
       setLoading(false);
     }
   };
-useEffect(() => {
-  document.title = 'إدارة المدن | ROVAYA';
-}, []); 
-
-
 
   useEffect(() => {
+    document.title = 'إدارة المدن | ROVAYA';
     fetchData();
   }, []);
 
@@ -114,7 +102,6 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Details Error:', error);
-
       Swal.fire({
         icon: 'error',
         title: 'خطأ',
@@ -161,8 +148,7 @@ useEffect(() => {
         nameAr: city.name || '',
         nameEn: englishData.name || city.nameEn || '',
         descriptionAr: city.description || '',
-        descriptionEn:
-          englishData.description || city.descriptionEn || '',
+        descriptionEn: englishData.description || city.descriptionEn || '',
         categoryIds: (city.categoryIds || []).map(String),
         latitude: city.latitude != null ? String(city.latitude) : '',
         longitude: city.longitude != null ? String(city.longitude) : ''
@@ -260,7 +246,6 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Save City Error:', error);
-
       Swal.fire({
         icon: 'error',
         title: 'فشل الحفظ',
@@ -270,8 +255,6 @@ useEffect(() => {
       setSaving(false);
     }
   };
-
-
 
   // حذف مدينة
   const handleDeleteCity = async (id) => {
@@ -357,12 +340,8 @@ useEffect(() => {
     setCityForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const updatePlaceForm = (key, value) => {
-    setPlaceForm(prev => ({ ...prev, [key]: value }));
-  };
-
-  // عرض تصنيفات المدينة
-  const renderCategoryBadges = (city, filled = false) => {
+  // ✅ عرض تصنيفات المدينة - يستخدم selectedCity مباشرة
+  const renderCategoryBadges = (city, showAll = false, filled = false) => {
     const names = city?.categoryNames || [];
 
     if (!names.length) {
@@ -373,9 +352,27 @@ useEffect(() => {
       );
     }
 
+    // ✅ في المودال: اعرض كل التصنيفات
+    if (showAll) {
+      return (
+        <Group gap={8} wrap="wrap">
+          {names.map((name, index) => (
+            <Badge
+              key={`${name}-${index}`}
+              color="teal"
+              variant="light"
+              radius="sm"
+              size="md"
+              px="sm"
+            >
+              {name}
+            </Badge>
+          ))}
+        </Group>
+      );
+    }
 
-
-
+    // ✅ في الكاردات الخارجية: اعرض أول 3 فقط
     return (
       <Group gap={5} wrap="wrap">
         {names.slice(0, 3).map((name, index) => (
@@ -644,7 +641,7 @@ useEffect(() => {
           style={{ textAlign: 'center', background: 'white' }}
         >
           <ThemeIcon size={75} radius="xl" color="gray" variant="light">
-            <IconBuilding size={38} />
+            <IconPhoto size={38} />
           </ThemeIcon>
 
           <Text fw={700} size="lg" mt="md">
@@ -710,7 +707,7 @@ useEffect(() => {
                   </Badge>
                 </Group>
 
-                {renderCategoryBadges(city)}
+                {renderCategoryBadges(city, false)}
 
                 <Text
                   size="sm"
@@ -765,7 +762,7 @@ useEffect(() => {
         </SimpleGrid>
       )}
 
-      {/* City details */}
+      {/* City details Modal - ✅ تم التصحيح لاستخدام selectedCity */}
       <Modal
         opened={isViewModalOpen}
         onClose={closeViewModal}
@@ -848,11 +845,12 @@ useEffect(() => {
 
                     <Divider my="md" />
 
+                    {/* ✅ هنا نستخدم selectedCity بدلاً من cityDetails */}
                     <Text size="xs" c="dimmed" fw={700} mb="xs">
-                      التصنيفات
+                      التصنيفات ({selectedCity.categoryNames?.length || 0})
                     </Text>
 
-                    {renderCategoryBadges(cityDetails)}
+                    {renderCategoryBadges(selectedCity, true)}
 
                     <Divider my="md" />
 
@@ -898,8 +896,6 @@ useEffect(() => {
                         </Text>
                       </Box>
                     </Group>
-
-                
                   </Group>
 
                   {cityDetails.places?.length ? (
