@@ -9,8 +9,8 @@ import {
   IconSearch, IconPlus, IconEdit, IconTrash, IconEye,
   IconPhoto, IconCheck, IconX, IconSparkles,
   IconCalendar, IconCategory, IconRefresh,
-  IconMapPin, IconClipboardList, IconFilter,
-  IconWorld, IconPhotoOff
+ IconClipboardList, IconFilter,
+ IconPhotoOff
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
@@ -42,6 +42,69 @@ const seasonLabel = (value) =>
 const activityLabel = (value) =>
   ACTIVITY_OPTIONS.find(x => x.value === value)?.label || value || '—';
 
+// ✅ الثابتة نُقلت للخارج
+const inputStyles = {
+  input: { borderColor: '#DCE7DF', borderRadius: 9 },
+  label: { color: PRIMARY, fontWeight: 600, marginBottom: 6 }
+};
+
+const getImageUrl = (imageName) => {
+  if (!imageName) return null;
+  if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+    return imageName;
+  }
+  const baseUrl = 'https://rovayabackend.runasp.net';
+  return `${baseUrl}/uploads/recommendations/${imageName}`;
+};
+
+/* ================================================================== */
+/*  ✅ المكوّنات المساعدة: معرّفة OUTSIDE الدالة الرئيسية              */
+/* ================================================================== */
+
+const RecommendationImage = ({ imageUrl, width = 64, height = 48 }) => {
+  const [imgError, setImgError] = useState(false);
+  const fullUrl = getImageUrl(imageUrl);
+
+  if (!fullUrl || imgError) {
+    return (
+      <Center w={width} h={height} style={{ background: '#EDF3EF', borderRadius: 10, border: '1px solid #E1EAE4' }}>
+        <IconPhotoOff size={22} color="#779184" />
+      </Center>
+    );
+  }
+
+  return (
+    <Image
+      src={fullUrl}
+      alt="Recommendation"
+      w={width}
+      h={height}
+      radius="md"
+      fit="cover"
+      onError={() => setImgError(true)}
+    />
+  );
+};
+
+const StatCard = ({ title, value, icon, color, subtitle }) => (
+  <Card radius="lg" padding="lg" withBorder style={{ borderColor: '#E5ECE7', background: '#fff', boxShadow: '0 3px 14px rgba(10,58,42,0.035)' }}>
+    <Group justify="space-between" align="center">
+      <Box>
+        <Text size="sm" c="dimmed" fw={600}>{title}</Text>
+        <Text size="2rem" fw={800} c={PRIMARY} mt={5}>{value}</Text>
+        <Text size="xs" c="dimmed" mt={3}>{subtitle}</Text>
+      </Box>
+      <ThemeIcon size={52} radius="xl" variant="light" color={color}>
+        {icon}
+      </ThemeIcon>
+    </Group>
+  </Card>
+);
+
+/* ================================================================== */
+/*  الدالة الرئيسية                                                    */
+/* ================================================================== */
+
 export function RecommendationsPage() {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
@@ -63,6 +126,7 @@ export function RecommendationsPage() {
     descriptionAr: '',
     descriptionEn: '',
     occasion: '',
+    occasionEn: '',
     displayOrder: 0,
     isActive: true,
     suggestedPlaceId: null
@@ -72,20 +136,8 @@ export function RecommendationsPage() {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  
-  // ✅ حالة جديدة لتتبع ما إذا كان المستخدم قد مسح الصورة عمداً
   const [isImageRemoved, setIsImageRemoved] = useState(false);
-  
   const [submitting, setSubmitting] = useState(false);
-
-  const getImageUrl = (imageName) => {
-    if (!imageName) return null;
-    if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
-      return imageName;
-    }
-    const baseUrl = 'https://rovayabackend.runasp.net';
-    return `${baseUrl}/uploads/recommendations/${imageName}`;
-  };
 
   const fetchRecommendations = async () => {
     setLoading(true);
@@ -136,7 +188,7 @@ export function RecommendationsPage() {
 
   const openFormModal = (item = null) => {
     setEditingItem(item);
-    setIsImageRemoved(false); // ✅ إعادة تعيين حالة المسح عند فتح الموديل
+    setIsImageRemoved(false);
 
     if (item) {
       setFormData({
@@ -145,6 +197,7 @@ export function RecommendationsPage() {
         descriptionAr: item.descriptionAr || '',
         descriptionEn: item.descriptionEn || '',
         occasion: item.occasion || '',
+        occasionEn: item.occasionEn || '',
         displayOrder: item.displayOrder || 0,
         isActive: item.isActive,
         suggestedPlaceId: item.suggestedPlaceId
@@ -157,7 +210,7 @@ export function RecommendationsPage() {
     } else {
       setFormData({
         titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '',
-        occasion: '', displayOrder: 0, isActive: true, suggestedPlaceId: null
+        occasion: '', occasionEn: '', displayOrder: 0, isActive: true, suggestedPlaceId: null
       });
       setSelectedSeason(null);
       setSelectedActivity(null);
@@ -168,14 +221,13 @@ export function RecommendationsPage() {
     setIsFormModalOpen(true);
   };
 
-  // ✅ دالة معالجة تغيير الصورة المُحسّنة
   const handleImageChange = (file) => {
     setImageFile(file);
     if (file) {
-      setIsImageRemoved(false); // المستخدم اختار صورة جديدة
+      setIsImageRemoved(false);
       setImagePreview(URL.createObjectURL(file));
     } else {
-      setIsImageRemoved(true); // المستخدم ضغط على زر المسح (X)
+      setIsImageRemoved(true);
       setImagePreview(null);
     }
   };
@@ -195,6 +247,7 @@ export function RecommendationsPage() {
       data.append('ActivityType', selectedActivity);
 
       if (formData.occasion) data.append('Occasion', formData.occasion);
+      if (formData.occasionEn) data.append('OccasionEn', formData.occasionEn);
       if (formData.suggestedPlaceId) data.append('SuggestedPlaceId', formData.suggestedPlaceId);
 
       data.append('DisplayOrder', formData.displayOrder.toString());
@@ -203,8 +256,7 @@ export function RecommendationsPage() {
       if (imageFile) {
         data.append('ImageFile', imageFile);
       } else if (isImageRemoved && editingItem) {
-        // ✅ إرسال إشارة للباك إند بأن المستخدم يريد مسح الصورة
-        data.append('RemoveImage', 'true'); 
+        data.append('RemoveImage', 'true');
       }
 
       let response;
@@ -257,55 +309,9 @@ export function RecommendationsPage() {
     }
   };
 
-  const RecommendationImage = ({ imageUrl, width = 64, height = 48 }) => {
-    const [imgError, setImgError] = useState(false);
-    const fullUrl = getImageUrl(imageUrl);
-
-    if (!fullUrl || imgError) {
-      return (
-        <Center w={width} h={height} style={{ background: '#EDF3EF', borderRadius: 10, border: '1px solid #E1EAE4' }}>
-          <IconPhotoOff size={22} color="#779184" />
-        </Center>
-      );
-    }
-
-    return (
-      <Image
-        src={fullUrl}
-        alt="Recommendation"
-        w={width}
-        h={height}
-        radius="md"
-        fit="cover"
-        onError={() => setImgError(true)}
-      />
-    );
-  };
-
-  const StatCard = ({ title, value, icon, color, subtitle }) => (
-    <Card radius="lg" padding="lg" withBorder style={{ borderColor: '#E5ECE7', background: '#fff', boxShadow: '0 3px 14px rgba(10,58,42,0.035)' }}>
-      <Group justify="space-between" align="center">
-        <Box>
-          <Text size="sm" c="dimmed" fw={600}>{title}</Text>
-          <Text size="2rem" fw={800} c={PRIMARY} mt={5}>{value}</Text>
-          <Text size="xs" c="dimmed" mt={3}>{subtitle}</Text>
-        </Box>
-        <ThemeIcon size={52} radius="xl" variant="light" color={color}>
-          {icon}
-        </ThemeIcon>
-      </Group>
-    </Card>
-  );
-
-  const inputStyles = {
-    input: { borderColor: '#DCE7DF', borderRadius: 9 },
-    label: { color: PRIMARY, fontWeight: 600, marginBottom: 6 }
-  };
-
-
-useEffect(() => {
-  document.title = 'إدارة التوصيات | ROVAYA';
-}, []); 
+  useEffect(() => {
+    document.title = 'إدارة التوصيات | ROVAYA';
+  }, []);
 
   return (
     <Box dir="rtl" style={{ background: LIGHT_BG, minHeight: 'calc(100vh - 75px)', color: PRIMARY }}>
@@ -498,7 +504,10 @@ useEffect(() => {
             <Box>
               <Text fw={700} size="sm" c={PRIMARY} mb="sm">معلومات إضافية</Text>
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                <TextInput label="المناسبة" placeholder="اختياري" value={formData.occasion} onChange={e => setFormData({ ...formData, occasion: e.target.value })} styles={inputStyles} />
+                <TextInput label="المناسبة (بالعربية)" placeholder="مثال: رحلة عائلية" value={formData.occasion} onChange={e => setFormData({ ...formData, occasion: e.target.value })} styles={inputStyles} />
+                <TextInput label="Occasion (English)" placeholder="e.g. Family Trip" value={formData.occasionEn} onChange={e => setFormData({ ...formData, occasionEn: e.target.value })} styles={inputStyles} />
+              </SimpleGrid>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mt="md">
                 <NumberInput label="ترتيب العرض" min={0} value={formData.displayOrder} onChange={val => setFormData({ ...formData, displayOrder: val })} styles={inputStyles} />
               </SimpleGrid>
             </Box>
@@ -527,7 +536,7 @@ useEffect(() => {
                       color="red"
                       onClick={() => {
                         setImageFile(null);
-                        setIsImageRemoved(true); // ✅ تأكيد المسح عند الضغط على X
+                        setIsImageRemoved(true);
                         setImagePreview(null);
                       }}
                     >
@@ -621,10 +630,13 @@ useEffect(() => {
               <Text fw={700} size="sm" c={PRIMARY} mb={6}>Description in English</Text>
               <Text size="sm" lh={1.7} c="dark.6">{viewItem.descriptionEn}</Text>
             </Box>
-            {viewItem.occasion && (
+            {(viewItem.occasion || viewItem.occasionEn) && (
               <Box>
                 <Text fw={700} size="sm" c={PRIMARY} mb={5}>المناسبة</Text>
                 <Text size="sm">{viewItem.occasion}</Text>
+                {viewItem.occasionEn && (
+                  <Text size="sm" c="dimmed" mt={3}>Occasion: {viewItem.occasionEn}</Text>
+                )}
               </Box>
             )}
             <Divider color="#E7EEE9" />
