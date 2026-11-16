@@ -16,6 +16,7 @@ import { CitySections } from '../Pages/ControlPanel/TourismGuide/CitySections';
 import { NewsManagement } from '../Pages/ControlPanel/News/NewsManagement';
 import { SettingsPage } from '../Pages/ControlPanel/Settings/SettingsPage';
 import { ForgotPasswordPage } from '../Pages/ControlPanel/Auth/ForgotPasswordPage';
+import { SupportTicketsPage } from '../Pages/ControlPanel/SupportTickets/SupportTickets';
 
 
 
@@ -63,6 +64,13 @@ const router = createBrowserRouter([
             element: <RecommendationsPage />,
           
           },{
+            path: 'support-tickets',
+            element: <SupportTicketsPage />,
+
+          },
+          
+          
+          {
             path: 'news',
             element: <NewsManagement />,
           },{

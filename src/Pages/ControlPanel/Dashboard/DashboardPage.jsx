@@ -90,9 +90,6 @@ function getGovernorate(lat, lon) {
   return nearest[0];
 }
 
-
-
-
 function normalizePlace(element) {
   const tags = element.tags || {};
   const center = element.center || element;
@@ -174,7 +171,7 @@ export function DashboardPage() {
   const [adminStats, setAdminStats] = useState({
     totalUsers: 0, 
     totalRecommendations: 0, 
-    supportTickets: 3,
+    supportTickets: 0, // ✅ تم تغيير القيمة الابتدائية إلى 0
     totalEmployees: 0
   });
 
@@ -274,7 +271,7 @@ export function DashboardPage() {
     }
   }, []);
 
-  // ✅ تم تحديث هذه الدالة لتستخدم API التوصيات الجديد
+  // ✅ تم تحديث هذه الدالة لجلب عدد تذاكر الدعم الفني ديناميكياً
   const fetchAdminStats = useCallback(async () => {
     try {
       // 1. جلب بيانات المستخدمين
@@ -295,24 +292,37 @@ export function DashboardPage() {
         ).length;
       }
 
-      // 2. ✅ جلب عدد التوصيات من الـ API الجديد
+      // 2. جلب عدد التوصيات
       const recommendationsResponse = await API.get('/api/Customer/recommendations').catch(() => null);
       let totalRecommendationsCount = 0;
       
       if (recommendationsResponse?.data?.success) {
-        // ✅ استخدام totalCount مباشرة من الـ response
         totalRecommendationsCount = recommendationsResponse.data.totalCount || 0;
+      }
+
+      // 3. ✅ جلب عدد تذاكر الدعم الفني ديناميكياً
+      let supportTicketsCount = 0;
+      try {
+        const ticketsResponse = await API.get('/api/auth/account/support/all-tickets');
+        if (ticketsResponse?.data?.success && Array.isArray(ticketsResponse.data.data)) {
+          // لحساب التذاكر "المفتوحة" فقط (جديدة، تم الاستلام، قيد المعالجة) يمكنك استخدام:
+          // .filter(t => t.status === 0 || t.status === 1 || t.status === 2).length
+          // حالياً نحسب إجمالي التذاكر:
+          supportTicketsCount = ticketsResponse.data.data.length;
+        }
+      } catch (error) {
+        console.error("Error fetching support tickets:", error);
       }
 
       setAdminStats({
         totalUsers: totalUsersCount,
         totalRecommendations: totalRecommendationsCount,
-        supportTickets: 3, // قيمة شكلية كما طلبت
+        supportTickets: supportTicketsCount, // ✅ تم تعيين القيمة الديناميكية هنا
         totalEmployees: totalEmployeesCount
       });
     } catch (error) {
       console.error("Error fetching admin stats:", error);
-      setAdminStats({ totalUsers: 0, totalRecommendations: 0, supportTickets: 3, totalEmployees: 0 });
+      setAdminStats({ totalUsers: 0, totalRecommendations: 0, supportTickets: 0, totalEmployees: 0 });
     } finally {
       setStatsLoading(false);
     }
@@ -353,12 +363,9 @@ export function DashboardPage() {
 
   const featuredCities = weatherData.slice(0, 5);
 
-
-useEffect(() => {
-  document.title = 'Dashboard | ROVAYA';
-}, []); 
-
-
+  useEffect(() => {
+    document.title = 'Dashboard | ROVAYA';
+  }, []); 
 
   return (
     <Box className={classes.page}>
@@ -381,7 +388,7 @@ useEffect(() => {
         </div>
       </Paper>
 
-      {/* ✅ قسم الإحصائيات المحدث */}
+      {/* ✅ قسم الإحصائيات المحدث والديناميكي */}
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg" mb="lg">
         {statsLoading ? Array.from({ length: 4 }, (_, i) => <Skeleton key={i} height={120} radius="md" />) : (
           [
@@ -402,7 +409,7 @@ useEffect(() => {
             { 
               label: 'تذاكر الدعم الفني', 
               value: adminStats.supportTickets, 
-              note: 'تذكرة مفتوحة (قريباً)', 
+              note: 'إجمالي التذاكر', // ✅ تم تحديث الملاحظة
               color: 'red', 
               Icon: IconHeadset 
             },

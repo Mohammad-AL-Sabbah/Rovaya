@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Box, NavLink, Text } from '@mantine/core';
-import { 
-  IconDashboard, 
-  IconMapPin, 
-  IconUsers, 
-  IconTicket, 
-  IconLogout, 
-  IconChevronDown, 
+import {
+  IconDashboard,
+  IconMapPin,
+  IconUsers,
+  IconTicket,
+  IconLogout,
+  IconChevronDown,
   IconChevronLeft,
   IconStar,
   IconBook,
@@ -16,7 +16,8 @@ import {
   IconUser,
   IconFileAnalytics,
   IconCategory,
-  IconBuildings
+  IconBuildings,
+  IconLifebuoy
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -37,8 +38,12 @@ export function Sidebar() {
     }
   });
 
-  // ✅ التحقق مما إذا كان المستخدم مدير نظام (SuperAdmin)
   const isSuperAdmin = userRoles.includes('SuperAdmin');
+  const isAdmin = userRoles.includes('Admin');
+  const isSupport = userRoles.includes('Support');
+
+  // ✅ يمكن للدعم الفني والإدارة الوصول للتذاكر
+  const canAccessTickets = isSuperAdmin || isAdmin || isSupport;
 
   const handleLogout = () => {
     Swal.fire({
@@ -77,29 +82,29 @@ export function Sidebar() {
   });
 
   return (
-    <Box 
-      style={{ 
-        width: 280, 
-        height: '100vh', 
-        background: '#ffffff', 
-        borderLeft: '1px solid #e2e8f0', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        position: 'fixed', 
-        right: 0, 
+    <Box
+      style={{
+        width: 280,
+        height: '100vh',
+        background: '#ffffff',
+        borderLeft: '1px solid #e2e8f0',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'fixed',
+        right: 0,
         top: 0,
         boxShadow: '-4px 0 15px rgba(0,0,0,0.03)',
         direction: 'rtl',
         zIndex: 100
       }}
     >
-      <Box 
-        px="lg" 
-        style={{ 
+      <Box
+        px="lg"
+        style={{
           height: 75,
-          backgroundColor: '#0A3A2A', 
-          display: 'flex', 
-          flexDirection: 'column', 
+          backgroundColor: '#0A3A2A',
+          display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           borderBottom: '1px solid #06241A'
         }}
@@ -109,7 +114,7 @@ export function Sidebar() {
       </Box>
 
       <Box style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
-        
+
         {/* --- 1. القائمة العامة --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">القائمة العامة</Text>
         <NavLink
@@ -125,7 +130,7 @@ export function Sidebar() {
 
         {/* --- 2. الإدارة التشغيلية --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">الإدارة التشغيلية</Text>
-        
+
         <NavLink
           label="المستخدمين"
           leftSection={<IconUsers size={20} stroke={1.5} />}
@@ -161,18 +166,29 @@ export function Sidebar() {
         </NavLink>
 
         <NavLink
-          label="التوصيات "
+          label="التوصيات"
           leftSection={<IconStar size={20} stroke={1.5} />}
           active={location.pathname === '/control-panel/recommendations'}
           onClick={() => navigate('/control-panel/recommendations')}
           style={navLinkStyle(location.pathname === '/control-panel/recommendations')}
         />
 
+        {/* ✅ تذاكر الدعم الفني - تظهر لـ Admin, SuperAdmin, Support */}
+        {canAccessTickets && (
+          <NavLink
+            label="تذاكر الدعم الفني"
+            leftSection={<IconLifebuoy size={20} stroke={1.5} />}
+            active={location.pathname === '/control-panel/support-tickets'}
+            onClick={() => navigate('/control-panel/support-tickets')}
+            style={navLinkStyle(location.pathname === '/control-panel/support-tickets')}
+          />
+        )}
+
         <div style={{ margin: '12px 0', borderTop: '1px solid #f1f5f9' }} />
 
         {/* --- 3. المحتوى والدليل --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">المحتوى والدليل</Text>
-        
+
         <NavLink
           label="الدليل السياحي"
           leftSection={<IconBook size={20} stroke={1.5} />}
@@ -226,7 +242,7 @@ export function Sidebar() {
 
         {/* --- 4. النظام --- */}
         <Text size="xs" fw={700} c="dimmed" mb="xs" px="sm" tt="uppercase">النظام</Text>
-        
+
         {/* ✅ إظهار سجل الرقابة فقط لمدير النظام (SuperAdmin) */}
         {isSuperAdmin && (
           <NavLink

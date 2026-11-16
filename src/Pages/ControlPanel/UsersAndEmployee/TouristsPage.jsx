@@ -2,15 +2,48 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box, Paper, Text, Group, Button, ThemeIcon, Table, Badge,
   Modal, TextInput, Select, Textarea, Stack, Divider, ActionIcon,
-  ScrollArea, Loader, Center, SimpleGrid, RingProgress
+  ScrollArea, Loader, Center, SimpleGrid, RingProgress,
+  Avatar, Image // ✅ جديد
 } from '@mantine/core';
 import {
   IconUsers, IconShieldLock, IconShieldOff,
   IconAlertTriangle, IconCheck, IconBriefcase,
-  IconEye, IconTrash, IconSearch
+  IconEye, IconTrash, IconSearch,
+  IconMail, IconPhone, IconMapPin, IconHeartbeat,
+  IconUserShield, IconAlertCircle, IconPill,
+  IconCalendar, IconPlus, IconPhotoOff // ✅ جديد
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import API from '../../../API/ApiAuthToken';
+
+// ✅ helper لبناء رابط الصورة الكامل من المسار النسبي
+const buildFullImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const baseUrl = 'https://rovayabackend.runasp.net';
+  return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
+// ✅ أنماط ثابتة لصورة الملف الشخصي (خارج المكون لتجنب إعادة الإنشاء)
+const PROFILE_AVATAR_STYLES = {
+  wrapper: {
+    width: 120,
+    height: 120,
+    minWidth: 120,
+    minHeight: 120,
+    flexShrink: 0,
+    borderRadius: 16,
+    overflow: 'hidden',
+    border: '3px solid #0A3A2A',
+    boxShadow: '0 4px 12px rgba(10, 58, 42, 0.15)',
+    backgroundColor: '#EAF1EC',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    display: 'block',
+  },
+};
 
 export function TouristsPage() {
   const [loading, setLoading] = useState(true);
@@ -20,6 +53,11 @@ export function TouristsPage() {
   const [blockModalOpened, setBlockModalOpened] = useState(false);
   const [unblockModalOpened, setUnblockModalOpened] = useState(false);
   const [selectedTourist, setSelectedTourist] = useState(null);
+
+  // ✅ حالات مودال التفاصيل
+  const [detailsModalOpened, setDetailsModalOpened] = useState(false);
+  const [touristDetails, setTouristDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   const [blockFormData, setBlockFormData] = useState({
     reason: '', durationUnit: 'Days', durationValue: ''
@@ -49,6 +87,35 @@ export function TouristsPage() {
   useEffect(() => {
     fetchAllUsers();
   }, []);
+
+  // ✅ جلب التفاصيل الكاملة - المسار الصحيح من الباك إند
+  const fetchTouristDetails = async (id) => {
+    setLoadingDetails(true);
+    setTouristDetails(null);
+    try {
+      const response = await API.get(`/api/auth/account/users/${id}/profile`);
+      if (response.data.success) {
+        setTouristDetails(response.data);
+      } else {
+        Swal.fire({ icon: 'error', title: 'خطأ', text: response.data.message || 'فشل في جلب التفاصيل' });
+      }
+    } catch (error) {
+      Swal.fire({ 
+        icon: 'error', 
+        title: 'خطأ', 
+        text: error.response?.data?.message || 'فشل في جلب تفاصيل السائح' 
+      });
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  // ✅ فتح مودال التفاصيل
+  const handleOpenDetails = (tourist) => {
+    setSelectedTourist(tourist);
+    setDetailsModalOpened(true);
+    fetchTouristDetails(tourist.id);
+  };
 
   // فلترة السياح فقط (Customer)
   const tourists = useMemo(() => {
@@ -171,15 +238,22 @@ export function TouristsPage() {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('ar-PS', { 
       year: 'numeric', month: 'long', day: 'numeric' 
     });
   };
 
-useEffect(() => {
-  document.title = 'إدارة السياح | ROVAYA';
-}, []); 
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleString('ar-PS', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  };
 
+  useEffect(() => {
+    document.title = 'إدارة السياح | ROVAYA';
+  }, []); 
 
   return (
     <Box style={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 75px)', direction: 'rtl'}}>
@@ -363,29 +437,14 @@ useEffect(() => {
                               </ActionIcon>
                             )}
                             
-                            {/* زر عرض التفاصيل */}
+                            {/* ✅ زر عرض الملف الكامل - يفتح المودال */}
                             <ActionIcon 
                               size="lg"
                               color="blue" 
                               variant="light" 
-                              title="عرض التفاصيل"
+                              title="عرض الملف الكامل"
                               style={{ ':hover': { backgroundColor: '#dbeafe' } }}
-                              onClick={() => Swal.fire({
-                                title: `${tourist.firstName} ${tourist.lastName}`,
-                                html: `
-                                  <div style="text-align: right; direction: rtl; font-family: sans-serif;">
-                                    <p><strong>البريد:</strong> ${tourist.email}</p>
-                                    <p><strong>الهاتف:</strong> ${tourist.phoneNumber || 'غير متوفر'}</p>
-                                    <p><strong>الدولة:</strong> ${tourist.country || 'غير محدد'}</p>
-                                    <p><strong>الصلاحية:</strong> ${tourist.roles.join(' - ')}</p>
-                                    <p><strong>الحالة:</strong> ${isBlocked ? 'محظور' : 'نشط'}</p>
-                                    <p><strong>تاريخ التسجيل:</strong> ${formatDate(tourist.createdAt)}</p>
-                                    <p><strong>معرف المستخدم:</strong> <code>${tourist.id}</code></p>
-                                  </div>
-                                `,
-                                confirmButtonText: 'إغلاق',
-                                confirmButtonColor: '#0A3A2A'
-                              })}
+                              onClick={() => handleOpenDetails(tourist)}
                             >
                               <IconEye size={18} />
                             </ActionIcon>
@@ -484,6 +543,243 @@ useEffect(() => {
               <Button color="green" onClick={handleUnblockTourist} leftSection={<IconCheck size={16} />} flex={1}>تأكيد فك الحظر</Button>
             </Group>
           </Stack>
+        )}
+      </Modal>
+
+      {/* ✅ ✅ ✅ مودال الملف الكامل ✅ ✅ ✅ */}
+      <Modal
+        opened={detailsModalOpened}
+        onClose={() => { setDetailsModalOpened(false); setTouristDetails(null); }}
+        title={
+          <Group gap="xs">
+            <IconUserShield size={24} color="#0A3A2A" />
+            <Text fw={800} size="lg">الملف الشخصي الكامل للسائح</Text>
+          </Group>
+        }
+        size="xl"
+        centered
+        radius="lg"
+      >
+        {loadingDetails ? (
+          <Center p="xl">
+            <Stack gap="md" align="center">
+              <Loader color="teal" size="lg" />
+              <Text c="dimmed">جاري تحميل الملف الكامل...</Text>
+            </Stack>
+          </Center>
+        ) : touristDetails ? (
+          <Stack gap="lg">
+            {/* ✅ 1. رأس الملف: صورة مربعة في الزاوية + المعلومات بجانبها */}
+            <Paper p="lg" radius="lg" withBorder style={{ 
+              background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)', 
+              border: '2px solid #0A3A2A' 
+            }}>
+              <Group align="flex-start" gap="lg" wrap="nowrap">
+                {/* ✅ حاوية الصورة: مربع ثابت 120x120 في الزاوية */}
+                <Box style={PROFILE_AVATAR_STYLES.wrapper}>
+                  {touristDetails.profileImageUrl ? (
+                    <Image
+                      src={buildFullImageUrl(touristDetails.profileImageUrl)}
+                      alt={`${touristDetails.firstName} ${touristDetails.lastName}`}
+                      style={PROFILE_AVATAR_STYLES.image}
+                      fit="cover"
+                      withPlaceholder
+                    />
+                  ) : (
+                    <Center w="100%" h="100%" style={{ backgroundColor: '#0A3A2A' }}>
+                      <Text size="xl" fw={800} c="#ffffff" style={{ fontSize: 42 }}>
+                        {touristDetails.firstName?.charAt(0) || '?'}
+                      </Text>
+                    </Center>
+                  )}
+                </Box>
+
+                {/* ✅ المعلومات بجانب الصورة */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Text size="xl" fw={800} c="#0A3A2A">
+                    {touristDetails.firstName} {touristDetails.lastName}
+                  </Text>
+                  <Group gap="xs" mt={6}>
+                    <Badge 
+                      color={selectedTourist?.status === 1 ? 'green' : 'red'} 
+                      variant="light"
+                      leftSection={selectedTourist?.status === 1 ? <IconCheck size={12}/> : <IconShieldLock size={12}/>}
+                    >
+                      {selectedTourist?.status === 1 ? 'نشط' : 'محظور'}
+                    </Badge>
+                    <Badge color="blue" variant="light">سائح (Customer)</Badge>
+                  </Group>
+                  <Group gap="xs" mt={10}>
+                    <IconMail size={14} color="#65756D" />
+                    <Text size="sm" c="#65756D" style={{ wordBreak: 'break-all' }}>
+                      {touristDetails.email}
+                    </Text>
+                  </Group>
+                  <Group gap="xs" mt={4}>
+                    <IconCalendar size={14} color="#65756D" />
+                    <Text size="sm" c="dimmed">
+                      تاريخ التسجيل: {formatDateTime(touristDetails.createdAt)}
+                    </Text>
+                  </Group>
+                </div>
+              </Group>
+            </Paper>
+
+            {/* 2. المعلومات الأساسية */}
+            <Paper p="lg" radius="lg" withBorder>
+              <Group gap="xs" mb="md">
+                <IconUsers size={20} color="#0A3A2A" />
+                <Text fw={700} c="#0A3A2A">المعلومات الأساسية</Text>
+              </Group>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                <Group gap="sm">
+                  <IconMail size={18} color="#65756D" />
+                  <div>
+                    <Text size="xs" c="dimmed">البريد الإلكتروني</Text>
+                    <Text size="sm" fw={600}>{touristDetails.email}</Text>
+                  </div>
+                </Group>
+                <Group gap="sm">
+                  <IconPhone size={18} color="#65756D" />
+                  <div>
+                    <Text size="xs" c="dimmed">رقم الهاتف الرئيسي</Text>
+                    <Text size="sm" fw={600} dir="ltr" style={{ textAlign: 'right' }}>
+                      {touristDetails.phoneNumber || 'غير متوفر'}
+                    </Text>
+                  </div>
+                </Group>
+                <Group gap="sm">
+                  <IconMapPin size={18} color="#65756D" />
+                  <div>
+                    <Text size="xs" c="dimmed">الدولة / الجنسية</Text>
+                    <Text size="sm" fw={600}>{touristDetails.country || 'غير محدد'}</Text>
+                  </div>
+                </Group>
+                <Group gap="sm">
+                  <IconUserShield size={18} color="#65756D" />
+                  <div>
+                    <Text size="xs" c="dimmed">المعرف (ID)</Text>
+                    <Text size="xs" c="dimmed" style={{ fontFamily: 'monospace' }}>
+                      {touristDetails.userId}
+                    </Text>
+                  </div>
+                </Group>
+              </SimpleGrid>
+
+              {/* الأرقام الإضافية */}
+              {touristDetails.additionalPhoneNumbers && touristDetails.additionalPhoneNumbers.length > 0 && (
+                <>
+                  <Divider my="md" />
+                  <Group gap="xs" mb="sm">
+                    <IconPlus size={16} color="#1d4ed8" />
+                    <Text fw={700} c="#1d4ed8" size="sm">أرقام هاتف إضافية ({touristDetails.additionalPhoneNumbers.length})</Text>
+                  </Group>
+                  <Group gap="xs" wrap="wrap">
+                    {touristDetails.additionalPhoneNumbers.map((num, idx) => (
+                      <Badge key={idx} color="blue" variant="light" size="lg" dir="ltr">
+                        {num}
+                      </Badge>
+                    ))}
+                  </Group>
+                </>
+              )}
+            </Paper>
+
+            {/* 3. أرقام الطوارئ */}
+            <Paper p="lg" radius="lg" withBorder style={{ backgroundColor: '#fffbeb', borderColor: '#f59e0b' }}>
+              <Group gap="xs" mb="md">
+                <IconAlertCircle size={20} color="#d97706" />
+                <Text fw={700} c="#92400e">أرقام الطوارئ</Text>
+              </Group>
+              {touristDetails.emergencyNumbers && touristDetails.emergencyNumbers.length > 0 ? (
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                  {touristDetails.emergencyNumbers.map((num, idx) => (
+                    <Group key={idx} gap="sm" p="sm" style={{ 
+                      backgroundColor: '#ffffff', 
+                      borderRadius: '8px', 
+                      border: '1px solid #fde68a' 
+                    }}>
+                      <ThemeIcon size="md" radius="md" color="orange" variant="light">
+                        <IconPhone size={16} />
+                      </ThemeIcon>
+                      <Text size="sm" fw={700} c="#78350f" dir="ltr">
+                        {num}
+                      </Text>
+                    </Group>
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Text size="sm" c="#92400e" ta="center" py="md">
+                  لم يتم إضافة أرقام طوارئ من قبل السائح
+                </Text>
+              )}
+            </Paper>
+
+            {/* 4. الملف الطبي */}
+            <Paper p="lg" radius="lg" withBorder style={{ backgroundColor: '#fef2f2', borderColor: '#f87171' }}>
+              <Group gap="xs" mb="md">
+                <IconHeartbeat size={20} color="#dc2626" />
+                <Text fw={700} c="#991b1b">الملف الطبي</Text>
+              </Group>
+              {touristDetails.medicalProfile ? (
+                <>
+                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+                    <Box p="md" style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <Text size="xs" c="dimmed" fw={600} mb={4}>الأمراض المزمنة</Text>
+                      <Text size="sm" c="#7f1d1d" fw={500}>
+                        {touristDetails.medicalProfile.chronicDiseases || 'لا يوجد'}
+                      </Text>
+                    </Box>
+                    <Box p="md" style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <Group gap={4} mb={4}>
+                        <IconAlertCircle size={12} color="#dc2626" />
+                        <Text size="xs" c="dimmed" fw={600}>الحساسية</Text>
+                      </Group>
+                      <Text size="sm" c="#7f1d1d" fw={500}>
+                        {touristDetails.medicalProfile.allergies || 'لا يوجد'}
+                      </Text>
+                    </Box>
+                    <Box p="md" style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <Group gap={4} mb={4}>
+                        <IconPill size={12} color="#dc2626" />
+                        <Text size="xs" c="dimmed" fw={600}>الأدوية الحالية</Text>
+                      </Group>
+                      <Text size="sm" c="#7f1d1d" fw={500}>
+                        {touristDetails.medicalProfile.currentMedications || 'لا يوجد'}
+                      </Text>
+                    </Box>
+                  </SimpleGrid>
+                  {touristDetails.medicalProfile.lastUpdated && (
+                    <Group gap="xs" mt="md">
+                      <IconCalendar size={12} color="#991b1b" />
+                      <Text size="xs" c="#991b1b">
+                        آخر تحديث للملف الطبي: {formatDateTime(touristDetails.medicalProfile.lastUpdated)}
+                      </Text>
+                    </Group>
+                  )}
+                </>
+              ) : (
+                <Text size="sm" c="#991b1b" ta="center" py="md">
+                  لم يتم تعبئة الملف الطبي من قبل السائح
+                </Text>
+              )}
+            </Paper>
+
+            <Divider />
+            
+            <Group justify="flex-end">
+              <Button variant="outline" color="gray" onClick={() => { setDetailsModalOpened(false); setTouristDetails(null); }}>
+                إغلاق
+              </Button>
+            </Group>
+          </Stack>
+        ) : (
+          <Center p="xl">
+            <Stack gap="md" align="center">
+              <IconAlertTriangle size={48} color="#cbd5e1" />
+              <Text c="dimmed">فشل في تحميل البيانات</Text>
+            </Stack>
+          </Center>
         )}
       </Modal>
 
